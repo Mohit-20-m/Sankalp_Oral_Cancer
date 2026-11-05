@@ -1,4 +1,4 @@
-# Model card — `oralscreen-lesion-triage` v1.0.0
+# Model card - `oralscreen-lesion-triage` v1.0.0
 
 | | |
 |---|---|
@@ -16,7 +16,7 @@
 
 ## Results
 
-**Held-out test set** — 346 photographs never used for training, model selection or calibration
+**Held-out test set** - 346 photographs never used for training, model selection or calibration
 (187 refer / 159 no_refer), at the screening threshold, with bootstrap 95 % confidence intervals:
 
 | Metric | Value | 95 % CI |
@@ -42,7 +42,7 @@ optimistic; the held-out test above is the reference estimate.
 | **EfficientNetV2-S** | **0.976** | 0.946 | 5 |
 | DINOv2-S (fine-tuned) | 0.972 | 0.923 | 7 |
 | ConvNeXt-Tiny | 0.970 | 0.942 | 11 |
-| DINOv2-S (linear probe) | 0.934 | 0.874 | — |
+| DINOv2-S (linear probe) | 0.934 | 0.874 | - |
 
 **Deployment parity:** FP32 ONNX matches PyTorch to 1.4 × 10⁻⁶; INT8 changes probabilities by at most 0.0033 and
 AUC by 6 × 10⁻⁵, so INT8 is the default.
@@ -58,11 +58,11 @@ AUC by 6 × 10⁻⁵, so INT8 is the default.
 | Source | n | Refer | Sensitivity | Specificity |
 |---|---|---|---|---|
 | zaidpy/oral-cancer-dataset | 191 | 97 | 0.897 | 0.968 (AUC 0.971) |
-| roboflow: leukoplakia (makhluk) | 43 | 43 | 0.953 | — |
-| roboflow: oral leukoplakia (oral-dquwv) | 39 | 39 | 0.923 | — |
-| salmansajid05/oral-diseases | 42 | 0 | — | 0.929 |
-| roboflow: aphthous ulcers (aadith) | 17 | 0 | — | 0.941 |
-| roboflow: leukoplakia (oral-cancer-emoot) | 7 | 7 | 0.857 | — |
+| roboflow: leukoplakia (makhluk) | 43 | 43 | 0.953 | - |
+| roboflow: oral leukoplakia (oral-dquwv) | 39 | 39 | 0.923 | - |
+| salmansajid05/oral-diseases | 42 | 0 | - | 0.929 |
+| roboflow: aphthous ulcers (aadith) | 17 | 0 | - | 0.941 |
+| roboflow: leukoplakia (oral-cancer-emoot) | 7 | 7 | 0.857 | - |
 | mohitmural/oral-cancer-lips-and-tongue | 7 | 1 | 1.000 | 0.833 |
 
 ## Training data
