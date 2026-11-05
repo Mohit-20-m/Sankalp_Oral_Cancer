@@ -11,17 +11,17 @@
 ![pytorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)
 ![onnx](https://img.shields.io/badge/ONNX-INT8-005CED?logo=onnx&logoColor=white)
 
-*Screening aid only — not a diagnostic device. A specialist confirms every high-risk result.*
+*Screening aid only - not a diagnostic device. A specialist confirms every high-risk result.*
 
 </div>
 
 ---
 
-India accounts for roughly a third of the world's oral cancer cases, and most are found late — although the
+India accounts for roughly a third of the world's oral cancer cases, and most are found late - although the
 disease is usually preceded by visible, treatable changes (leukoplakia, erythroplakia, oral submucous fibrosis)
 that a trained eye can spot in a photograph. **Sankalp** puts that first look in the hands of community health
-workers (ASHAs): they photograph the mouth on a phone, record habits and symptoms, and the system decides —
-transparently — who needs to see a specialist, then follows the patient until they do.
+workers (ASHAs): they photograph the mouth on a phone, record habits and symptoms, and the system decides -
+transparently - who needs to see a specialist, then follows the patient until they do.
 
 ## How it works
 
@@ -89,9 +89,9 @@ python training/oralscreen/inference_reference.py --artifacts models/current --i
 
 ## Roadmap
 
-- [x] **v0.1.0** — Lesion triage model, training pipeline, model card and release artefacts
-- [ ] **v0.2.0** — Backend: inference service, clinical decision engine, referral and specialist workflow, audit
-- [ ] **v1.0.0** — Web app for ASHA workers and specialists: guided capture, quality gate, mouth-opening measurement
+- [x] **v0.1.0** - Lesion triage model, training pipeline, model card and release artefacts
+- [ ] **v0.2.0** - Backend: inference service, clinical decision engine, referral and specialist workflow, audit
+- [ ] **v1.0.0** - Web app for ASHA workers and specialists: guided capture, quality gate, mouth-opening measurement
 
 ## Responsible use
 
