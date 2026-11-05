@@ -1,0 +1,36 @@
+{
+  "md5": 798,
+  "phash_pairs_confirmed": 2735,
+  "phash_pairs_rejected_by_pixel_check": 120,
+  "embedding_pairs": 1982,
+  "images": 8346,
+  "groups": 6673,
+  "conflicting_groups": 8,
+  "images_in_conflicting_groups": 33,
+  "unique_after_grouping_by_label": {
+    "no_refer": 3443,
+    "refer": 3222
+  },
+  "unique_per_source": {
+    "no_refer": {
+      "Teeth_Dataset": 2648,
+      "mohitmural/oral-cancer-lips-and-tongue": 31,
+      "roboflow:aadith/ulcer_detection-12cr0": 102,
+      "roboflow:makhluk/leukoplakia-8woh8": 0,
+      "roboflow:oral-cancer-emoot/leukoplakia": 0,
+      "roboflow:oral-dquwv/oralleukoplakia": 0,
+      "salmansajid05/oral-diseases": 206,
+      "zaidpy/oral-cancer-dataset": 456
+    },
+    "refer": {
+      "Teeth_Dataset": 2229,
+      "mohitmural/oral-cancer-lips-and-tongue": 7,
+      "roboflow:aadith/ulcer_detection-12cr0": 0,
+      "roboflow:makhluk/leukoplakia-8woh8": 214,
+      "roboflow:oral-cancer-emoot/leukoplakia": 35,
+      "roboflow:oral-dquwv/oralleukoplakia": 192,
+      "salmansajid05/oral-diseases": 0,
+      "zaidpy/oral-cancer-dataset": 545
+    }
+  }
+}
