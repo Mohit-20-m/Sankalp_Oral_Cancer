@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software or model, please cite it as below."
+title: "Sankalp: AI-assisted early detection of oral cancer for frontline health workers"
+type: software
+authors:
+  - given-names: Mohit
+    family-names: MuraliKrishna
+repository-code: "https://github.com/Mohit-20-m/Sankalp_Oral_Cancer"
+license: MIT
+version: 0.1.0
+date-released: 2026-11-05
+keywords:
+  - oral cancer
+  - oral potentially malignant disorders
+  - medical image classification
+  - screening
+  - deep learning
+  - global health

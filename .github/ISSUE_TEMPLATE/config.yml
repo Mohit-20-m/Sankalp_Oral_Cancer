@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/Mohit-20-m/Sankalp_Oral_Cancer/security/advisories/new
+    about: Please report security and privacy issues privately.
