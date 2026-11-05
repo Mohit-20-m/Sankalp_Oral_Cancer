@@ -1,0 +1,37 @@
+name: e2e
+
+# Boots the full stack (about 15 containers) and runs the end-to-end journey and the fault-tolerance scenarios.
+# Heavy, so it runs on demand and weekly rather than on every push.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  stack:
+    name: Full stack journey
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start the stack (placeholder model)
+        run: docker compose up -d --build
+      - name: Wait until ready
+        run: |
+          for i in $(seq 1 120); do
+            if curl -sk https://localhost/api/ready | grep -q '"status": *"ready"'; then echo "ready after $((i * 5)) s"; exit 0; fi
+            sleep 5
+          done
+          docker compose ps
+          docker compose logs --tail=80
+          exit 1
+      - name: End-to-end journey (logins, AI, rules, referral, review, governance, MLOps)
+        run: ./ops/demo.sh
+      - name: Fault tolerance (AI down, queue down, API replica down, audit tampering)
+        run: ./ops/chaos.sh all
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --tail=200
