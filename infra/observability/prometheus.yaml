@@ -1,0 +1,23 @@
+# Prometheus inside grafana/otel-lgtm: OTLP metrics (pushed) + scraping of the OralScreen services.
+otlp:
+  keep_identifying_resource_attributes: true
+  promote_resource_attributes: [service.instance.id, service.name, service.namespace, deployment.environment]
+storage:
+  tsdb:
+    out_of_order_time_window: 30m
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: oralscreen-api
+    metrics_path: /metrics
+    static_configs: [{ targets: ["api:8000", "api-2:8000"] }]
+  - job_name: oralscreen-inference
+    metrics_path: /metrics
+    static_configs: [{ targets: ["inference:8090"] }]
+  - job_name: oralscreen-relay
+    static_configs: [{ targets: ["relay:9101"] }]
+  - job_name: traefik
+    static_configs: [{ targets: ["traefik:8082"] }]
+  - job_name: keycloak
+    metrics_path: /auth/metrics
+    static_configs: [{ targets: ["keycloak:9000"] }]

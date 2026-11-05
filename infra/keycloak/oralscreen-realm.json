@@ -1,0 +1,317 @@
+{
+  "realm": "oralscreen",
+  "enabled": true,
+  "displayName": "OralScreen",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "maxFailureWaitSeconds": 900,
+  "permanentLockout": false,
+  "passwordPolicy": "length(10) and upperCase(1) and digits(1) and specialChars(1) and notUsername",
+  "accessTokenLifespan": 1800,
+  "ssoSessionIdleTimeout": 28800,
+  "ssoSessionMaxLifespan": 86400,
+  "offlineSessionIdleTimeout": 2592000,
+  "eventsEnabled": true,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "asha",
+        "description": "ASHA / community health worker"
+      },
+      {
+        "name": "nurse",
+        "description": "PHC staff nurse"
+      },
+      {
+        "name": "specialist",
+        "description": "Oral medicine specialist"
+      },
+      {
+        "name": "clinical_lead",
+        "description": "Clinical lead (approves rules & models)"
+      },
+      {
+        "name": "district_officer",
+        "description": "District health officer (aggregates only)"
+      },
+      {
+        "name": "admin",
+        "description": "Platform administrator"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "oralscreen-app",
+      "name": "OralScreen apps (phone, specialist console, dashboards)",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "https://localhost/*",
+        "http://localhost:*/*",
+        "oralscreen://callback"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      },
+      "protocolMappers": [
+        {
+          "name": "facility_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "facility_id",
+            "claim.name": "facility_id",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "6419b190-2030-5b9f-9d46-ab8329418ca3",
+      "username": "kavya.asha",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "kavya.asha@oralscreen.demo",
+      "firstName": "Kavya",
+      "lastName": "Shetty",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "asha",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": [],
+      "attributes": {
+        "facility_id": [
+          "d5bb6730-0aac-5ec9-92d7-74d62f80641f"
+        ]
+      }
+    },
+    {
+      "id": "94dc0e00-4ed7-5d05-b45a-2c6f998f2ecc",
+      "username": "suma.asha",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "suma.asha@oralscreen.demo",
+      "firstName": "Suma",
+      "lastName": "Gowda",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "asha",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": [],
+      "attributes": {
+        "facility_id": [
+          "e50a168f-8c87-5dc4-aefa-2bcdd3c3a159"
+        ]
+      }
+    },
+    {
+      "id": "4c13198f-57dc-5254-9968-5cc1f748de87",
+      "username": "rekha.nurse",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "rekha.nurse@oralscreen.demo",
+      "firstName": "Rekha",
+      "lastName": "Pai",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "nurse",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": [],
+      "attributes": {
+        "facility_id": [
+          "d5bb6730-0aac-5ec9-92d7-74d62f80641f"
+        ]
+      }
+    },
+    {
+      "id": "b28d4246-e91e-5b65-93ce-fb3debdcef52",
+      "username": "dr.meera",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "dr.meera@oralscreen.demo",
+      "firstName": "Dr.",
+      "lastName": "Meera Rao",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "specialist",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": [],
+      "attributes": {
+        "facility_id": [
+          "c8cb86ec-8ce4-5e3d-b6d8-1e42fdfa3db6"
+        ]
+      }
+    },
+    {
+      "id": "473f4096-909b-575d-b3c9-e955a44ac4c7",
+      "username": "dr.arjun",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "dr.arjun@oralscreen.demo",
+      "firstName": "Dr.",
+      "lastName": "Arjun Bhat",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "specialist",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": [],
+      "attributes": {
+        "facility_id": [
+          "c8cb86ec-8ce4-5e3d-b6d8-1e42fdfa3db6"
+        ]
+      }
+    },
+    {
+      "id": "311a941c-d504-5980-8fb7-445a2707d10d",
+      "username": "lead.rao",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "lead.rao@oralscreen.demo",
+      "firstName": "Dr.",
+      "lastName": "Prakash Rao",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "clinical_lead",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": []
+    },
+    {
+      "id": "f21993dc-f038-5ea3-8bc1-1a40f240e79c",
+      "username": "lead.iyer",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "lead.iyer@oralscreen.demo",
+      "firstName": "Dr.",
+      "lastName": "Lakshmi Iyer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "clinical_lead",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": []
+    },
+    {
+      "id": "7d25f914-edd6-5c03-bf71-43486b2597ee",
+      "username": "officer.dk",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "officer.dk@oralscreen.demo",
+      "firstName": "District",
+      "lastName": "Health Officer (demo)",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "district_officer",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": []
+    },
+    {
+      "id": "7bff386e-3080-5a04-a156-a108a992eee4",
+      "username": "admin.ops",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin.ops@oralscreen.demo",
+      "firstName": "Platform",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OralScreen@2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin",
+        "default-roles-oralscreen"
+      ],
+      "requiredActions": []
+    }
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "subComponents": {},
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\": [{\"name\": \"username\", \"displayName\": \"${username}\", \"validations\": {\"length\": {\"min\": 3, \"max\": 255}, \"username-prohibited-characters\": {}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"email\", \"displayName\": \"${email}\", \"validations\": {\"email\": {}, \"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"firstName\", \"displayName\": \"${firstName}\", \"validations\": {\"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"lastName\", \"displayName\": \"${lastName}\", \"validations\": {\"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"facility_id\", \"displayName\": \"Facility (UUID)\", \"permissions\": {\"view\": [\"admin\"], \"edit\": [\"admin\"]}, \"multivalued\": false}], \"groups\": [], \"unmanagedAttributePolicy\": \"ADMIN_EDIT\"}"
+          ]
+        }
+      }
+    ]
+  }
+}

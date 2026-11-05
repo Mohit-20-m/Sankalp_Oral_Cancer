@@ -1,0 +1,399 @@
+# OralScreen backend — one command:   docker compose up --build
+# Optional profiles:   --profile monitoring  (Grafana + Prometheus + Tempo + Loki: grafana/otel-lgtm)
+#                      --profile mlops       (MLflow tracking server + Flower task monitor)
+#                      --profile hapi        (external HAPI FHIR server; also set OS_HAPI_URL in .env)
+#                      --profile tunnel      (ngrok — public URL for Twilio SMS/IVR webhooks)
+# Every value has a safe local default, so a missing .env still starts. Copy .env.example → .env to customise.
+name: oralscreen
+
+x-app-env: &app-env
+  OS_ENV: ${OS_ENV:-dev}
+  OS_PUBLIC_BASE_URL: https://${PUBLIC_HOST:-localhost}
+  OS_DB_HOST: postgres
+  OS_DB_APP_PASSWORD: ${OS_DB_APP_PASSWORD:-oralscreen-app-pw}
+  OS_DB_OWNER_PASSWORD: ${OS_DB_OWNER_PASSWORD:-oralscreen-owner-pw}
+  OS_REDIS_URL: redis://redis:6379/0
+  OS_S3_ENDPOINT: http://minio:9000
+  OS_S3_PUBLIC_ENDPOINT: ${OS_S3_PUBLIC_ENDPOINT:-https://${PUBLIC_HOST:-localhost}}   # photo links go through Traefik (HTTPS)
+  OS_CAPTURE_BASE_URL: ${CAPTURE_BASE_URL:-}     # web app phone-capture QR base, e.g. https://192.168.1.20
+  OS_S3_ACCESS_KEY: ${MINIO_ROOT_USER:-oralscreen}
+  OS_S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-oralscreen-minio-secret}
+  OS_AUTH_MODE: keycloak
+  OS_KEYCLOAK_INTERNAL_URL: http://keycloak:8080/auth
+  OS_KEYCLOAK_ISSUER: https://${PUBLIC_HOST:-localhost}/auth/realms/oralscreen
+  OS_OPA_URL: http://opa:8181
+  OS_VAULT_ADDR: http://vault:8200
+  OS_VAULT_TOKEN: ${VAULT_APP_TOKEN:-oralscreen-svc-change-me-2026}
+  OS_INFERENCE_URL: http://inference:8090
+  OS_MODELS_DIR: /models
+  OS_MESSAGING_MODE: ${OS_MESSAGING_MODE:-sandbox}
+  OS_TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+  OS_TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+  OS_TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+  OS_PUBLIC_WEBHOOK_BASE: ${PUBLIC_WEBHOOK_BASE:-}
+  OS_MLFLOW_TRACKING_URI: http://mlflow:5000
+  OS_HAPI_URL: ${OS_HAPI_URL:-}
+  OS_OTEL_ENABLED: ${OS_OTEL_ENABLED:-false}     # set true together with --profile monitoring
+  OS_OTEL_ENDPOINT: http://lgtm:4318
+  OS_FHIR_BASE_URL: https://${PUBLIC_HOST:-localhost}/api/v1/fhir
+  OS_LOG_LEVEL: ${OS_LOG_LEVEL:-INFO}
+
+x-app: &app
+  image: oralscreen/backend:2.0.0
+  build:
+    context: ./services
+    args:
+      INSTALL_EXTRAS: ${INSTALL_EXTRAS:-true}
+  restart: unless-stopped
+  environment: *app-env
+  volumes:
+    - models:/models
+  networks: [backend]
+  logging: &logging
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+x-after-bootstrap: &after-bootstrap
+  bootstrap: { condition: service_completed_successfully }
+
+services:
+  # ───────────────────────────── edge ─────────────────────────────
+  traefik:
+    image: traefik:v3.2
+    restart: unless-stopped
+    command: ["--configFile=/etc/traefik/traefik.yml"]
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "127.0.0.1:8088:8080"          # Traefik dashboard (local only)
+    volumes:
+      - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./infra/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    mem_limit: 96m
+    networks: [backend]
+    logging: *logging
+
+  # ───────────────────────────── data ─────────────────────────────
+  postgres:
+    build: ./infra/postgres
+    image: oralscreen/postgres:16-postgis-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres-superuser-pw}
+      OS_DB_OWNER_PASSWORD: ${OS_DB_OWNER_PASSWORD:-oralscreen-owner-pw}
+      OS_DB_APP_PASSWORD: ${OS_DB_APP_PASSWORD:-oralscreen-app-pw}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak-db-pw}
+      MLFLOW_DB_PASSWORD: ${MLFLOW_DB_PASSWORD:-mlflow-db-pw}
+      HAPI_DB_PASSWORD: ${HAPI_DB_PASSWORD:-hapi-db-pw}
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - max_connections=200
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=pgbackrest --stanza=oralscreen archive-push %p
+      - -c
+      - archive_timeout=300
+      - -c
+      - log_min_duration_statement=500
+      - -c
+      - password_encryption=scram-sha-256
+    ports:
+      - "127.0.0.1:${PG_HOST_PORT:-5433}:5432"   # 5433 on the Mac, so a locally installed PostgreSQL does not clash
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - pgbackrest:/var/lib/pgbackrest
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d oralscreen"]   # TCP: false during first-run init
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    mem_limit: 640m
+    shm_size: 128m
+    networks: [backend]
+    logging: *logging
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory", "96mb",
+              "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 128m
+    networks: [backend]
+    logging: *logging
+
+  minio:
+    # MinIO's own images were removed from Docker Hub / quay.io in Sept 2026; Silo is the maintained community
+    # fork (same S3 API, versioning, Object Lock, same env vars and command).
+    image: docker.io/pgsty/silo:RELEASE.2026-10-26T00-00-00Z
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_UPDATE: "off"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-oralscreen}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-oralscreen-minio-secret}
+    ports:
+      - "9000:9000"                    # presigned photo uploads from the phone go here directly
+      - "127.0.0.1:9001:9001"          # MinIO console
+    volumes:
+      - miniodata:/data
+    # no healthcheck: the image ships no client tools; bootstrap waits for storage itself (retries for 3 minutes)
+    mem_limit: 320m
+    networks: [backend]
+    logging: *logging
+
+  # ───────────────────────────── security ─────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    restart: unless-stopped
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak-db-pw}
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-Admin@OralScreen2026}
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: https://${PUBLIC_HOST:-localhost}/auth      # fixed issuer for tokens from any network path
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      JAVA_OPTS_KC_HEAP: "-Xms96m -Xmx448m -XX:MaxMetaspaceSize=192m"
+    volumes:
+      - ./infra/keycloak/oralscreen-realm.json:/opt/keycloak/data/import/oralscreen-realm.json:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /auth/health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && while read -r l <&3; do case \"$$l\" in *UP*) exit 0;; esac; done; exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    mem_limit: 800m
+    networks: [backend]
+    logging: *logging
+
+  opa:
+    image: openpolicyagent/opa:0.70.0-static
+    restart: unless-stopped
+    command: ["run", "--server", "--addr", "0.0.0.0:8181", "--log-level", "error", "--log-format", "json",
+              "--set", "decision_logs.console=true", "/policies/authz.rego"]
+    volumes:
+      - ./infra/opa/policies:/policies:ro
+    mem_limit: 96m
+    networks: [backend]
+    logging: *logging
+
+  vault:
+    image: hashicorp/vault:1.18
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/vault/config/entrypoint.sh"]
+    environment:
+      VAULT_APP_TOKEN: ${VAULT_APP_TOKEN:-oralscreen-svc-change-me-2026}
+      SKIP_SETCAP: "true"
+    cap_add: [IPC_LOCK]
+    volumes:
+      - ./infra/vault/vault.hcl:/vault/config/vault.hcl:ro
+      - ./infra/vault/policy-oralscreen.hcl:/vault/config/policy-oralscreen.hcl:ro
+      - ./infra/vault/entrypoint.sh:/vault/config/entrypoint.sh:ro
+      - vaultdata:/vault/file
+      - vaultkeys:/vault/keys
+      - vaultlogs:/vault/logs
+    ports:
+      - "127.0.0.1:8200:8200"
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/ready"]
+      interval: 3s
+      timeout: 2s
+      retries: 40
+    mem_limit: 160m
+    networks: [backend]
+    logging: *logging
+
+  # ───────────────────────────── OralScreen services ─────────────────────────────
+  bootstrap:                           # one-shot: migrations, buckets, secrets, model, seed data
+    <<: *app
+    restart: "no"
+    command: ["python", "-m", "app.bootstrap.run"]
+    environment:
+      <<: *app-env
+      OS_SEED_DEMO: ${OS_SEED_DEMO:-true}
+      OS_MODEL_SEED_DIR: /seed-models
+    volumes:
+      - models:/models
+      - ./models:/seed-models:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      minio: { condition: service_started }
+      vault: { condition: service_healthy }
+    mem_limit: 512m
+
+  inference:
+    <<: *app
+    command: ["uvicorn", "app.inference.main:app", "--host", "0.0.0.0", "--port", "8090", "--workers", "1"]
+    depends_on: *after-bootstrap
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8090/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+    mem_limit: 640m
+
+  api: &api
+    <<: *app
+    command: ["uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers",
+              "--forwarded-allow-ips", "*", "--timeout-keep-alive", "15"]
+    depends_on:
+      <<: *after-bootstrap
+      keycloak: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      opa: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+    mem_limit: 448m
+
+  api-2:                               # second replica: Traefik fails over if one goes down
+    <<: *api
+
+  worker:                              # Celery worker + beat (scheduled jobs)
+    <<: *app
+    command: ["celery", "-A", "app.worker.celery_app", "worker", "-B", "--pool", "threads", "--concurrency", "4",
+              "--loglevel", "INFO", "--schedule", "/tmp/oralscreen/celerybeat-schedule", "--hostname", "worker@%h"]
+    depends_on:
+      <<: *after-bootstrap
+      redis: { condition: service_healthy }
+    mem_limit: 1600m
+
+  relay:                               # transactional outbox → Celery (survives Redis / worker outages)
+    <<: *app
+    command: ["python", "-m", "app.worker.relay"]
+    depends_on:
+      <<: *after-bootstrap
+      redis: { condition: service_healthy }
+    mem_limit: 192m
+
+  # ───────────────────────────── optional: monitoring ─────────────────────────────
+  lgtm:
+    image: grafana/otel-lgtm:0.8.1
+    profiles: [monitoring]
+    restart: unless-stopped
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-Admin@OralScreen2026}
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./infra/observability/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
+      - lgtmdata:/data
+    mem_limit: 900m
+    networks: [backend]
+    logging: *logging
+
+  # ───────────────────────────── optional: MLOps ─────────────────────────────
+  mlflow:
+    build: ./infra/mlflow
+    image: oralscreen/mlflow:3.1.0
+    profiles: [mlops]
+    restart: unless-stopped
+    command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000",
+              "--backend-store-uri", "postgresql://mlflow:${MLFLOW_DB_PASSWORD:-mlflow-db-pw}@postgres:5432/mlflow",
+              "--artifacts-destination", "s3://os-models/mlflow", "--serve-artifacts", "--workers", "1"]
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-oralscreen}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-oralscreen-minio-secret}
+    ports:
+      - "127.0.0.1:5000:5000"
+    depends_on:
+      postgres: { condition: service_healthy }
+      bootstrap: { condition: service_completed_successfully }
+    mem_limit: 512m
+    networks: [backend]
+    logging: *logging
+
+  flower:
+    <<: *app
+    profiles: [mlops]
+    command: ["celery", "-A", "app.worker.celery_app", "flower", "--port=5555"]
+    ports:
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      redis: { condition: service_healthy }
+    mem_limit: 192m
+
+  # ───────────────────────────── optional: external FHIR server ─────────────────────────────
+  hapi:
+    image: hapiproject/hapi:v7.4.0
+    profiles: [hapi]
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hapi
+      SPRING_DATASOURCE_USERNAME: hapi
+      SPRING_DATASOURCE_PASSWORD: ${HAPI_DB_PASSWORD:-hapi-db-pw}
+      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
+      HAPI_FHIR_FHIR_VERSION: R4
+      JAVA_TOOL_OPTIONS: "-Xmx640m"
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      postgres: { condition: service_healthy }
+    mem_limit: 900m
+    networks: [backend]
+    logging: *logging
+
+  # ───────────────────────────── optional: public tunnel for Twilio ─────────────────────────────
+  ngrok:
+    image: ngrok/ngrok:3
+    profiles: [tunnel]
+    restart: unless-stopped
+    command: ["http", "https://traefik:443", "--log", "stdout"]
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:-}
+    ports:
+      - "127.0.0.1:4040:4040"          # shows the public URL → put it in PUBLIC_WEBHOOK_BASE
+    depends_on: [traefik]
+    networks: [backend]
+    logging: *logging
+
+networks:
+  backend:
+    name: oralscreen-net
+
+volumes:
+  pgdata:
+  pgbackrest:
+  redisdata:
+  miniodata:
+  vaultdata:
+  vaultkeys:
+  vaultlogs:
+  models:
+  lgtmdata:

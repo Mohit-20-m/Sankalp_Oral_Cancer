@@ -1,0 +1,31 @@
+# Static configuration. Routes live in dynamic.yml (file provider — no Docker socket is mounted, by design).
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint: { to: websecure, scheme: https }
+  websecure:
+    address: ":443"
+    http:
+      tls: {}            # Traefik's self-signed default certificate (browser warning on first visit is expected)
+  metrics:
+    address: ":8082"
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+api:
+  dashboard: true
+  insecure: true        # dashboard on :8080 inside the network; published only on 127.0.0.1:8088
+ping: {}
+metrics:
+  prometheus:
+    entryPoint: metrics
+accessLog:
+  format: json
+  fields:
+    headers:
+      defaultMode: drop        # never log Authorization headers or tokens
+log:
+  level: INFO

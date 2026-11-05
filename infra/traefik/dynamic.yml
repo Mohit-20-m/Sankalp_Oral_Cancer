@@ -1,0 +1,88 @@
+http:
+  routers:
+    provider-connect:          # public endpoint (local doctors scanning a card) — strict rate limit
+      rule: "PathPrefix(`/api/v1/provider-connect`)"
+      entryPoints: [websecure, web]
+      service: api
+      middlewares: [provider-ratelimit, security-headers]
+      priority: 100
+    webhooks:
+      rule: "PathPrefix(`/api/v1/webhooks`)"
+      entryPoints: [websecure, web]
+      service: api
+      middlewares: [webhook-ratelimit]
+      priority: 90
+    api:
+      rule: "PathPrefix(`/api`)"
+      entryPoints: [websecure, web]
+      service: api
+      middlewares: [api-ratelimit, security-headers, body-limit]
+      priority: 50
+    auth:
+      rule: "PathPrefix(`/auth`)"
+      entryPoints: [websecure, web]
+      service: keycloak
+      middlewares: [security-headers]
+      priority: 40
+    storage:                   # presigned photo / heat-map links (signed for this host) → object storage
+      rule: "PathPrefix(`/os-images`) || PathPrefix(`/os-derived`) || PathPrefix(`/os-models`)"
+      entryPoints: [websecure, web]
+      service: storage
+      middlewares: [api-ratelimit]
+      priority: 30
+    metrics-block:             # API /metrics is for Prometheus inside the network only
+      rule: "Path(`/metrics`)"
+      entryPoints: [websecure, web]
+      service: noop@internal
+      middlewares: [deny]
+      priority: 200
+
+  middlewares:
+    provider-ratelimit:
+      rateLimit: { average: 10, period: 1m, burst: 5 }
+    webhook-ratelimit:
+      rateLimit: { average: 120, period: 1m, burst: 60 }
+    api-ratelimit:
+      rateLimit: { average: 300, burst: 200 }
+    body-limit:
+      buffering: { maxRequestBodyBytes: 26214400 }      # 25 MB (photos use presigned uploads anyway)
+    deny:
+      ipAllowList: { sourceRange: ["127.0.0.2/32"] }
+    security-headers:
+      headers:
+        stsSeconds: 31536000
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: no-referrer
+        customResponseHeaders:
+          Server: ""
+
+    web-headers:
+      headers:
+        stsSeconds: 31536000
+        contentTypeNosniff: true
+        referrerPolicy: no-referrer
+        permissionsPolicy: "camera=(self), microphone=()"
+        customResponseHeaders:
+          Server: ""
+
+  services:
+    api:                       # two API replicas; unhealthy one is taken out automatically
+      loadBalancer:
+        servers:
+          - url: "http://api:8000"
+          - url: "http://api-2:8000"
+        healthCheck:
+          path: /api/health
+          interval: 5s
+          timeout: 2s
+        passHostHeader: true
+    keycloak:
+      loadBalancer:
+        servers:
+          - url: "http://keycloak:8080"
+    storage:
+      loadBalancer:
+        servers:
+          - url: "http://minio:9000"
+        passHostHeader: true
