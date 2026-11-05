@@ -1,0 +1,2 @@
+evidently==0.7.23
+flower==2.0.1
