@@ -22,7 +22,7 @@ keep you informed, credit you in the advisory if you wish, and coordinate disclo
 In scope: code in this repository and the released model artefacts (for example, a crafted image that crashes the
 inference code, or a way to bypass checksum verification in `scripts/fetch-model.sh`).
 
-Out of scope: the third-party datasets and pretrained backbones, and the clinical accuracy of the model — please
+Out of scope: the third-party datasets and pretrained backbones, and the clinical accuracy of the model - please
 report accuracy problems as a regular issue.
 
 ## Supported versions

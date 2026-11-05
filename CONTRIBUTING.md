@@ -5,10 +5,10 @@ speed. Please read this short guide before opening a pull request.
 
 ## Ways to help
 
-- **Report a bug** or a confusing result — use the *Bug report* issue template.
-- **Propose a feature** — open a *Feature request* first so we can agree on the approach.
-- **Improve the model** — new public datasets, better augmentation, evaluation on field photographs.
-- **Documentation and translations** — especially Kannada and other Indian languages.
+- **Report a bug** or a confusing result - use the *Bug report* issue template.
+- **Propose a feature** - open a *Feature request* first so we can agree on the approach.
+- **Improve the model** - new public datasets, better augmentation, evaluation on field photographs.
+- **Documentation and translations** - especially Kannada and other Indian languages.
 
 ## Development workflow
 
@@ -29,7 +29,7 @@ speed. Please read this short guide before opening a pull request.
 
 ## Rules that protect patients
 
-- **Never commit patient data** — no photographs, names, phone numbers or identifiers, not even in tests or
+- **Never commit patient data** - no photographs, names, phone numbers or identifiers, not even in tests or
   screenshots. Use synthetic or public-dataset examples.
 - **Never commit dataset images or model weights.** Weights are published as release assets
   (`scripts/fetch-model.sh`); dataset images stay with their original sources.

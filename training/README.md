@@ -1,4 +1,4 @@
-# Training pipeline — lesion triage model
+# Training pipeline - lesion triage model
 
 This package trains Sankalp's **refer / no-refer** model for intra-oral photographs and exports everything the
 backend needs to run it. It runs end to end on a free Kaggle GPU (2 × T4) with one click (**Run All**), either
@@ -18,7 +18,7 @@ python -m oralscreen.pipeline --config config.yaml --from-stage final        # r
 | 1 | **scan** | Finds every attached image dataset and maps each folder to `refer`, `no_refer`, `excluded` or `unknown` (keyword + exact-token rules in `config.yaml`). Histopathology, X-ray and dental-only classes are excluded. |
 | 2 | **clean** | Drops broken or tiny files and groups duplicates: exact copies (MD5), flipped/rotated copies (dihedral pHash + pixel check) and recoloured/cropped copies (embedding similarity). |
 | 3 | **split** | Group-aware, stratified held-out **test** (15 %) and **calibration** sets plus 5-fold CV. Duplicates never cross splits; images from train-only sources stay in training. |
-| 4 | **select** | Trains 4 candidates on fold 0 — ConvNeXt-Tiny, EfficientNetV2-S, DINOv2-S (fine-tuned) and DINOv2-S (linear probe) — and keeps the best by validation AUC. |
+| 4 | **select** | Trains 4 candidates on fold 0 - ConvNeXt-Tiny, EfficientNetV2-S, DINOv2-S (fine-tuned) and DINOv2-S (linear probe) - and keeps the best by validation AUC. |
 | 5 | **cv** | 5-fold cross-validation of the winner (mean ± sd). |
 | 6 | **final** | Phone-style augmentation, MixUp/CutMix, balanced sampler, EMA weights, warm-up + cosine LR, early stopping; Platt calibration; *screening* (≥ 90 % sensitivity) and *balanced* thresholds chosen on the calibration set. |
 | 7 | **evaluate** | Untouched test set: accuracy, balanced accuracy, sensitivity, specificity, AUC, F1 with bootstrap 95 % CIs; per-source results, ROC, confusion matrices, calibration, CAM heat maps. |
@@ -30,10 +30,10 @@ The selected backbone and its results are documented in [`../models/MODEL_CARD.m
 
 ## Reproducing on Kaggle
 
-1. **Upload the code** — zip this folder and create a private Kaggle Dataset from it named `oralscreen-code`.
-2. **Create a notebook** — *File → Import Notebook* →
+1. **Upload the code** - zip this folder and create a private Kaggle Dataset from it named `oralscreen-code`.
+2. **Create a notebook** - *File → Import Notebook* →
    [`notebooks/sankalp_training_kaggle.ipynb`](../notebooks/sankalp_training_kaggle.ipynb).
-3. **Settings** — Accelerator *GPU T4 × 2*, Internet *on* (pretrained backbones are downloaded from `timm`).
+3. **Settings** - Accelerator *GPU T4 × 2*, Internet *on* (pretrained backbones are downloaded from `timm`).
 4. **Add the data** (*Add Data* → search):
 
    | Dataset | Kaggle slug |
@@ -43,9 +43,9 @@ The selected backbone and its results are documented in [`../models/MODEL_CARD.m
    | Oral Cancer (Lips and Tongue) images | `shivam17299/oral-cancer-lips-and-tongue-images` |
    | Oral Diseases | `salmansajid05/oral-diseases` |
 
-5. **Optional — Roboflow sets** (≈ 1,100 leukoplakia and aphthous-ulcer images): add a Kaggle secret named
+5. **Optional - Roboflow sets** (≈ 1,100 leukoplakia and aphthous-ulcer images): add a Kaggle secret named
    `ROBOFLOW_API_KEY`. Without it these sources are skipped and the run continues.
-6. **Run** — check the scan table after stage 1 (every folder should have a sensible label), then
+6. **Run** - check the scan table after stage 1 (every folder should have a sensible label), then
    *Save Version → Save & Run All*. A full run takes about 2–4 h; `FAST_MODE = True` skips cross-validation.
 
 Configuration lives in [`config.yaml`](config.yaml); every key can be overridden from the notebook.

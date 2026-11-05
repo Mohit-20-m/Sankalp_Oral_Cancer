@@ -45,5 +45,5 @@ the training pipeline.
 Decode the image, apply EXIF orientation, convert to RGB; letterbox the longest side to 224 px (area interpolation
 when shrinking) and pad to 224 × 224 with RGB (124, 116, 104); scale to [0, 1] and normalise with ImageNet
 mean/std; feed NCHW float32 as `input`. `prob = sigmoid(w · embedding + b)` with the weights in `head.json`;
-refer if `prob ≥ 0.780` (screening threshold). Every client — backend, phone, notebook — must reproduce
+refer if `prob ≥ 0.780` (screening threshold). Every client - backend, phone, notebook - must reproduce
 [`inference_reference.py`](../training/oralscreen/inference_reference.py) within 1e-3.
