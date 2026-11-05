@@ -1,0 +1,127 @@
+# =====================================================================
+# Sankalp — training configuration
+# Every setting has a safe default. Change only what you need.
+# =====================================================================
+
+project:
+  name: oralscreen-lesion-triage
+  model_version: "1.0.0"
+  seed: 42
+
+paths:
+  # Folders that are scanned recursively for images.
+  # On Kaggle, every dataset you "Add Data" appears under /kaggle/input.
+  input_roots: ["/kaggle/input"]
+  # Everything the pipeline writes goes here.
+  work_dir: "/kaggle/working/oralscreen"
+  # Final zip handed to the backend.
+  artifacts_zip: "/kaggle/working/oralscreen_artifacts.zip"
+  # Folder name of THIS code package under /kaggle/input (never scanned for images).
+  code_dataset_names: ["oralscreen-code", "oralscreen-phase1"]
+
+# ---------------------------------------------------------------------
+# Optional Roboflow sources (free account + API key stored as a Kaggle
+# Secret named ROBOFLOW_API_KEY). If the key is missing they are skipped.
+# ---------------------------------------------------------------------
+roboflow:
+  enabled: true
+  api_key_secret: ROBOFLOW_API_KEY
+  download_dir: "/kaggle/working/roboflow"
+  projects:
+    - {workspace: makhluk,         project: leukoplakia-8woh8, label: refer,    note: "oral leukoplakia"}
+    - {workspace: oral-cancer-emoot, project: leukoplakia,     label: refer,    note: "oral leukoplakia"}
+    - {workspace: oral-dquwv,      project: oralleukoplakia,   label: refer,    note: "oral leukoplakia"}
+    - {workspace: aadith,          project: ulcer_detection-12cr0, label: no_refer, note: "recurrent aphthous ulcers (benign)"}
+
+# ---------------------------------------------------------------------
+# Label mapping: every image is mapped to  refer / no_refer / excluded.
+# Rules are applied to the image's folder path (lower-cased, '_' and '-'
+# turned into spaces) in this order:
+#   1) exclude_keywords      -> image ignored
+#   2) exact_folder_tokens   -> exact folder-name match (e.g. MOD codes)
+#   3) no_refer_keywords     -> checked BEFORE refer (so "non cancer" is safe)
+#   4) refer_keywords
+#   5) anything else         -> "unknown" (ignored and listed in the scan report)
+# ---------------------------------------------------------------------
+labels:
+  exclude_sources: ["multi cancer", "histopath", "ndb ufes", "h e stained", "oral cancer histopathological"]
+  exclude_keywords: ["histopath", "histolog", "h e stain", "x ray", "xray", "radiograph", "opg",
+                     "caries", "calculus", "hypodontia", "tooth discoloration", "teeth discoloration",
+                     "data caries", "dental", "panoramic", "mask", "masks", "labels"]
+  exact_folder_tokens:
+    # Mouth and Oral Diseases (MOD) dataset class codes
+    cas: no_refer   # canker sores (aphthous)
+    cos: no_refer   # cold sores (herpes labialis)
+    gum: no_refer   # gingivostomatitis
+    ot: no_refer    # oral thrush
+    mc: refer       # mouth cancer
+    oc: refer       # oral cancer
+    olp: refer      # oral lichen planus (potentially malignant disorder)
+  no_refer_keywords: ["non cancer", "noncancer", "non cancerous", "not cancer", "no cancer",
+                      "normal", "healthy", "benign", "canker", "cold sore", "aphthous",
+                      "mouth ulcer", "ulcer", "thrush", "gingivitis", "gingivostomatitis"]
+  refer_keywords: ["cancer", "cancerous", "malignant", "oscc", "carcinoma", "leukoplakia",
+                   "lichen", "erythroplakia", "submucous", "osmf", "precancer", "opmd", "suspicious"]
+  fail_on_unknown: false
+
+data:
+  image_extensions: [".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"]
+  min_side: 64              # images smaller than this are dropped
+  max_per_source: null      # cap per source (null = no cap)
+  image_size: 224           # model input size (square, letterboxed)
+  cache_max_side: 512       # images are resized once to this (fast training; benchmark keeps 512px)
+
+dedupe:
+  # Open datasets often contain the same photo many times (flipped, rotated,
+  # pre-augmented). Near-duplicates are GROUPED so they never cross the
+  # train/test boundary; only one copy per group is used for evaluation.
+  exact_md5: true
+  phash_dihedral: true      # catches flipped / rotated copies
+  phash_hamming: 6
+  pixel_corr: 0.92          # a pHash match must also correlate pixel-wise (avoids false merges)
+  embedding: true           # catches crops / colour-shifted copies
+  embedding_model: convnext_tiny.fb_in22k_ft_in1k
+  embedding_cosine: 0.955
+  pretrained: true
+
+split:
+  test_fraction: 0.15       # held-out test set (never seen in training or tuning)
+  calib_fraction: 0.15      # carved from the dev set for the final model's calibration/threshold
+  n_folds: 5                # cross-validation on the dev set
+
+train:
+  device: auto
+  num_workers: 4
+  amp: true
+  epochs: 22
+  freeze_epochs: 2          # train the head first, then unfreeze the backbone
+  patience: 6               # early stopping on validation AUC
+  batch_size: 32
+  weight_decay: 0.05
+  label_smoothing: 0.05
+  mix_prob: 0.5             # chance a batch uses MixUp or CutMix
+  mixup_alpha: 0.2
+  cutmix_alpha: 1.0
+  ema_decay: 0.998
+  grad_clip: 1.0
+  balance: sampler          # sampler | pos_weight | none
+  candidates:
+    - {key: convnext_tiny,  timm: convnext_tiny.fb_in22k_ft_in1k,   lr_backbone: 1.0e-4, lr_head: 1.0e-3, drop_path: 0.1, kind: finetune}
+    - {key: effnetv2_s,     timm: tf_efficientnetv2_s.in21k_ft_in1k, lr_backbone: 2.0e-4, lr_head: 1.0e-3, drop_path: 0.1, kind: finetune}
+    - {key: dinov2_s,       timm: vit_small_patch14_dinov2.lvd142m, lr_backbone: 2.0e-5, lr_head: 1.0e-3, drop_path: 0.05, kind: finetune}
+    - {key: dinov2_s_probe, timm: vit_small_patch14_dinov2.lvd142m, kind: probe}
+  pretrained: true
+  selection_metric: auc     # metric used to pick the best candidate on fold 0
+  run_cv_on_best: true
+
+evaluate:
+  target_sensitivity: 0.90  # "screening" operating point: catch >= 90% of refer cases
+  bootstrap: 1000
+  tta: true                 # also report test-time-augmentation results (deployment uses single pass)
+
+export:
+  opset: 17
+  int8: true
+  reference_thumbnails: true   # thumbnails for "similar confirmed cases" in the backend
+  thumbnail_size: 256
+  benchmark_max_side: 512

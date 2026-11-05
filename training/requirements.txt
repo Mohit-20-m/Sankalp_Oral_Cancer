@@ -1,0 +1,17 @@
+# Kaggle already provides torch, torchvision, timm, albumentations, opencv, scikit-learn, pandas, matplotlib.
+# The notebook installs the rest automatically.
+torch>=2.1
+torchvision
+timm>=0.9.12
+albumentations>=1.3
+opencv-python-headless
+scikit-learn>=1.2
+pandas
+numpy
+matplotlib
+pyyaml
+pillow
+imagehash>=4.3
+onnx>=1.14
+onnxruntime>=1.16
+roboflow
