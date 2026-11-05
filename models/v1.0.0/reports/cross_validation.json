@@ -1,0 +1,76 @@
+{
+  "backbone": "effnetv2_s",
+  "folds": [
+    {
+      "fold": 0,
+      "n": 276,
+      "auc": 0.9777397260273971,
+      "balanced_accuracy": 0.952950474183351,
+      "sensitivity": 0.952054794520548,
+      "specificity": 0.9538461538461539,
+      "best_epoch": 10
+    },
+    {
+      "fold": 1,
+      "n": 279,
+      "auc": 0.9656729664821969,
+      "balanced_accuracy": 0.915344053461418,
+      "sensitivity": 0.9044585987261147,
+      "specificity": 0.9262295081967213,
+      "best_epoch": 4
+    },
+    {
+      "fold": 2,
+      "n": 275,
+      "auc": 0.9743501326259947,
+      "balanced_accuracy": 0.9324933687002652,
+      "sensitivity": 0.903448275862069,
+      "specificity": 0.9615384615384616,
+      "best_epoch": 4
+    },
+    {
+      "fold": 3,
+      "n": 276,
+      "auc": 0.9798675496688742,
+      "balanced_accuracy": 0.9461986754966887,
+      "sensitivity": 0.9403973509933775,
+      "specificity": 0.952,
+      "best_epoch": 7
+    },
+    {
+      "fold": 4,
+      "n": 276,
+      "auc": 0.9637865986503003,
+      "balanced_accuracy": 0.9096923322174398,
+      "sensitivity": 0.9738562091503268,
+      "specificity": 0.8455284552845529,
+      "best_epoch": 9
+    }
+  ],
+  "completed_folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "summary": {
+    "auc": {
+      "mean": 0.9722833946909528,
+      "std": 0.007201660713576769
+    },
+    "balanced_accuracy": {
+      "mean": 0.9313357808118325,
+      "std": 0.01879903473842108
+    },
+    "sensitivity": {
+      "mean": 0.9348430458504872,
+      "std": 0.030651132598327836
+    },
+    "specificity": {
+      "mean": 0.927828515773178,
+      "std": 0.0478889219073241
+    }
+  },
+  "note": "Per-fold thresholds are optimized on the same fold validation data and are therefore optimistic. The independent held-out test result is the appropriate final performance estimate."
+}

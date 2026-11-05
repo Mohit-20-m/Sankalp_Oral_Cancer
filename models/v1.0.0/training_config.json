@@ -1,0 +1,223 @@
+{
+  "project": {
+    "name": "oralscreen-lesion-triage",
+    "model_version": "1.0.0",
+    "seed": 42
+  },
+  "paths": {
+    "input_roots": [
+      "/kaggle/input",
+      "/kaggle/working/extra_data/mod-original"
+    ],
+    "work_dir": "/kaggle/working/oralscreen",
+    "artifacts_zip": "/kaggle/working/oralscreen_artifacts.zip",
+    "code_dataset_names": [
+      "oralscreen-code",
+      "oralscreen-phase1"
+    ]
+  },
+  "roboflow": {
+    "enabled": true,
+    "api_key_secret": "ROBOFLOW_API_KEY",
+    "download_dir": "/kaggle/working/roboflow",
+    "projects": [
+      {
+        "workspace": "makhluk",
+        "project": "leukoplakia-8woh8",
+        "label": "refer",
+        "note": "oral leukoplakia"
+      },
+      {
+        "workspace": "oral-cancer-emoot",
+        "project": "leukoplakia",
+        "label": "refer",
+        "note": "oral leukoplakia"
+      },
+      {
+        "workspace": "oral-dquwv",
+        "project": "oralleukoplakia",
+        "label": "refer",
+        "note": "oral leukoplakia"
+      },
+      {
+        "workspace": "aadith",
+        "project": "ulcer_detection-12cr0",
+        "label": "no_refer",
+        "note": "recurrent aphthous ulcers (benign)"
+      }
+    ]
+  },
+  "labels": {
+    "exclude_sources": [
+      "multi cancer",
+      "histopath",
+      "ndb ufes",
+      "h e stained",
+      "oral cancer histopathological"
+    ],
+    "exclude_keywords": [
+      "histopath",
+      "histolog",
+      "h e stain",
+      "x ray",
+      "xray",
+      "radiograph",
+      "opg",
+      "caries",
+      "calculus",
+      "hypodontia",
+      "tooth discoloration",
+      "teeth discoloration",
+      "data caries",
+      "dental",
+      "panoramic",
+      "mask",
+      "masks",
+      "labels",
+      "gingivitis",
+      "augmented",
+      "preview"
+    ],
+    "exact_folder_tokens": {
+      "cas": "no_refer",
+      "cos": "no_refer",
+      "gum": "no_refer",
+      "ot": "no_refer",
+      "mc": "refer",
+      "oc": "refer",
+      "olp": "refer"
+    },
+    "no_refer_keywords": [
+      "non cancer",
+      "noncancer",
+      "non cancerous",
+      "not cancer",
+      "no cancer",
+      "normal",
+      "healthy",
+      "benign",
+      "canker",
+      "cold sore",
+      "aphthous",
+      "mouth ulcer",
+      "ulcer",
+      "thrush",
+      "gingivitis",
+      "gingivostomatitis"
+    ],
+    "refer_keywords": [
+      "cancer",
+      "cancerous",
+      "malignant",
+      "oscc",
+      "carcinoma",
+      "leukoplakia",
+      "lichen",
+      "erythroplakia",
+      "submucous",
+      "osmf",
+      "precancer",
+      "opmd",
+      "suspicious"
+    ],
+    "fail_on_unknown": false
+  },
+  "data": {
+    "image_extensions": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".bmp",
+      ".webp",
+      ".tif",
+      ".tiff"
+    ],
+    "min_side": 64,
+    "max_per_source": null,
+    "image_size": 224,
+    "cache_max_side": 512
+  },
+  "dedupe": {
+    "exact_md5": true,
+    "phash_dihedral": true,
+    "phash_hamming": 6,
+    "pixel_corr": 0.92,
+    "embedding": true,
+    "embedding_model": "convnext_tiny.fb_in22k_ft_in1k",
+    "embedding_cosine": 0.955,
+    "pretrained": true
+  },
+  "split": {
+    "test_fraction": 0.2,
+    "calib_fraction": 0.15,
+    "n_folds": 5,
+    "train_only_sources": [
+      "teeth_dataset",
+      "mod-mouth-oral-diseases",
+      "mouth-and-oral-diseases"
+    ]
+  },
+  "train": {
+    "device": "auto",
+    "num_workers": 4,
+    "amp": true,
+    "epochs": 22,
+    "freeze_epochs": 2,
+    "patience": 6,
+    "batch_size": 32,
+    "weight_decay": 0.05,
+    "label_smoothing": 0.05,
+    "mix_prob": 0.5,
+    "mixup_alpha": 0.2,
+    "cutmix_alpha": 1.0,
+    "ema_decay": 0.998,
+    "grad_clip": 1.0,
+    "balance": "sampler",
+    "candidates": [
+      {
+        "key": "convnext_tiny",
+        "timm": "convnext_tiny.fb_in22k_ft_in1k",
+        "lr_backbone": 0.0001,
+        "lr_head": 0.001,
+        "drop_path": 0.1,
+        "kind": "finetune"
+      },
+      {
+        "key": "effnetv2_s",
+        "timm": "tf_efficientnetv2_s.in21k_ft_in1k",
+        "lr_backbone": 0.0002,
+        "lr_head": 0.001,
+        "drop_path": 0.1,
+        "kind": "finetune"
+      },
+      {
+        "key": "dinov2_s",
+        "timm": "vit_small_patch14_dinov2.lvd142m",
+        "lr_backbone": 2e-05,
+        "lr_head": 0.001,
+        "drop_path": 0.05,
+        "kind": "finetune"
+      },
+      {
+        "key": "dinov2_s_probe",
+        "timm": "vit_small_patch14_dinov2.lvd142m",
+        "kind": "probe"
+      }
+    ],
+    "pretrained": true,
+    "selection_metric": "auc",
+    "run_cv_on_best": true
+  },
+  "evaluate": {
+    "target_sensitivity": 0.9,
+    "bootstrap": 1000,
+    "tta": true
+  },
+  "export": {
+    "opset": 17,
+    "int8": true,
+    "reference_thumbnails": true,
+    "thumbnail_size": 256,
+    "benchmark_max_side": 512
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "contract_version": "1.0",
+  "model_name": "oralscreen-lesion-triage",
+  "model_version": "1.0.0",
+  "backbone": "tf_efficientnetv2_s.in21k_ft_in1k",
+  "task": "binary triage: refer (suspicious, needs specialist) vs no_refer",
+  "positive_class": "refer",
+  "files": {
+    "full_fp32": "lesion_model.onnx",
+    "backbone_fp32": "backbone.onnx",
+    "full_int8": "lesion_model_int8.onnx",
+    "backbone_int8": "backbone_int8.onnx"
+  },
+  "input": {
+    "name": "input",
+    "dtype": "float32",
+    "layout": "NCHW",
+    "shape": [
+      "batch",
+      3,
+      224,
+      224
+    ],
+    "color": "RGB",
+    "preprocessing": [
+      "decode image, apply EXIF orientation, convert to RGB",
+      "letterbox: resize longest side to 224 keeping aspect ratio (INTER_AREA when shrinking)",
+      "pad to 224x224, image centred, pad colour RGB [124, 116, 104]",
+      "scale to [0,1], subtract mean, divide by std (per channel)"
+    ],
+    "mean": [
+      0.48500001430511475,
+      0.4560000002384186,
+      0.4059999883174896
+    ],
+    "std": [
+      0.2290000021457672,
+      0.2240000069141388,
+      0.22499999403953552
+    ],
+    "pad_rgb": [
+      124,
+      116,
+      104
+    ],
+    "size": 224
+  },
+  "outputs_full_model": {
+    "prob": "float32 [batch] calibrated probability of 'refer' (Platt calibration applied)",
+    "logit": "float32 [batch] raw logit (before calibration)",
+    "embedding": "float32 [batch, 1280] pooled features (use L2-normalised for similarity search)",
+    "cam": "float32 [batch, 7, 7] heat map in [0,1]; upsample to image size"
+  },
+  "outputs_backbone_model": {
+    "embedding": "float32 [batch, 1280]",
+    "cam_features": "float32 [batch, 1280, 7, 7]"
+  },
+  "head_formula": {
+    "prob": "sigmoid((dot(weights, embedding) + bias) / temperature)",
+    "cam": "relu(sum_d weights[d] * cam_features[d]) / (max + 1e-6)"
+  },
+  "decision": {
+    "thresholds": {
+      "balanced": 0.7796038109379979,
+      "screening": 0.7796038109379979
+    },
+    "meaning": {
+      "screening": "default operating point; tuned on calibration data to reach the target sensitivity",
+      "balanced": "maximises balanced accuracy on calibration data"
+    },
+    "per_person_score": "maximum prob across the 6 mouth sites"
+  },
+  "ood_file": "ood_stats.npz",
+  "disclaimer": "Screening decision-support aid only. Not a diagnostic device.",
+  "parity": {
+    "full_fp32": {
+      "max_abs_diff_vs_torch": 1.3709068298339844e-06,
+      "auc": 0.9598378776713339
+    },
+    "full_int8": {
+      "max_abs_diff_vs_torch": 0.0032264888286590576,
+      "auc": 0.9597764676983542
+    },
+    "int8_auc_drop": 6.140997297965356e-05,
+    "int8_recommended": true
+  }
+}

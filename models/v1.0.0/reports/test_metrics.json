@@ -1,0 +1,188 @@
+{
+  "n_test_unique_photos": 346,
+  "calibration": {
+    "a": 1.279500368491418,
+    "c": 0.4986577613335471
+  },
+  "thresholds": {
+    "balanced": 0.7796038109379979,
+    "screening": 0.7796038109379979
+  },
+  "test": {
+    "balanced": {
+      "threshold": 0.7796038109379979,
+      "n": 346,
+      "positives": 187,
+      "accuracy": 0.930635838150289,
+      "balanced_accuracy": 0.9320620186324959,
+      "sensitivity": 0.9144385026737968,
+      "specificity": 0.949685534591195,
+      "ppv": 0.9553072625698324,
+      "npv": 0.9041916167664671,
+      "f1": 0.9344262295081968,
+      "tp": 171,
+      "fp": 8,
+      "tn": 151,
+      "fn": 16,
+      "auc": 0.9687552551037568,
+      "average_precision": 0.962181814913284,
+      "brier": 0.04915126571161459,
+      "ci95": {
+        "accuracy": [
+          0.9017341040462428,
+          0.9566473988439307
+        ],
+        "balanced_accuracy": [
+          0.9048056680866289,
+          0.9586368797611355
+        ],
+        "sensitivity": [
+          0.8709632113084451,
+          0.9521154027024484
+        ],
+        "specificity": [
+          0.9139072847682119,
+          0.9811350235849057
+        ],
+        "f1": [
+          0.9062456837016575,
+          0.96
+        ],
+        "auc": [
+          0.9476574830165375,
+          0.9868390889182813
+        ]
+      }
+    },
+    "screening": {
+      "threshold": 0.7796038109379979,
+      "n": 346,
+      "positives": 187,
+      "accuracy": 0.930635838150289,
+      "balanced_accuracy": 0.9320620186324959,
+      "sensitivity": 0.9144385026737968,
+      "specificity": 0.949685534591195,
+      "ppv": 0.9553072625698324,
+      "npv": 0.9041916167664671,
+      "f1": 0.9344262295081968,
+      "tp": 171,
+      "fp": 8,
+      "tn": 151,
+      "fn": 16,
+      "auc": 0.9687552551037568,
+      "average_precision": 0.962181814913284,
+      "brier": 0.04915126571161459,
+      "ci95": {
+        "accuracy": [
+          0.9017341040462428,
+          0.9566473988439307
+        ],
+        "balanced_accuracy": [
+          0.9048056680866289,
+          0.9586368797611355
+        ],
+        "sensitivity": [
+          0.8709632113084451,
+          0.9521154027024484
+        ],
+        "specificity": [
+          0.9139072847682119,
+          0.9811350235849057
+        ],
+        "f1": [
+          0.9062456837016575,
+          0.96
+        ],
+        "auc": [
+          0.9476574830165375,
+          0.9868390889182813
+        ]
+      }
+    }
+  },
+  "ece": 0.026928072314840734,
+  "test_tta_balanced": {
+    "threshold": 0.7796038109379979,
+    "n": 346,
+    "positives": 187,
+    "accuracy": 0.930635838150289,
+    "balanced_accuracy": 0.9330037332257088,
+    "sensitivity": 0.9037433155080213,
+    "specificity": 0.9622641509433962,
+    "ppv": 0.9657142857142857,
+    "npv": 0.8947368421052632,
+    "f1": 0.9337016574585635,
+    "tp": 169,
+    "fp": 6,
+    "tn": 153,
+    "fn": 18,
+    "auc": 0.9731779504254532,
+    "average_precision": 0.9680858655933805,
+    "brier": 0.049358453629047366
+  },
+  "per_source": [
+    {
+      "source": "mohitmural/oral-cancer-lips-and-tongue",
+      "n": 7,
+      "refer": 1,
+      "accuracy": 0.8571428571428571,
+      "sensitivity": 1.0,
+      "specificity": 0.8333333333333334,
+      "auc": 0.8333333333333334
+    },
+    {
+      "source": "roboflow:aadith/ulcer_detection-12cr0",
+      "n": 17,
+      "refer": 0,
+      "accuracy": 0.9411764705882353,
+      "sensitivity": 0.0,
+      "specificity": 0.9411764705882353,
+      "auc": null
+    },
+    {
+      "source": "roboflow:makhluk/leukoplakia-8woh8",
+      "n": 43,
+      "refer": 43,
+      "accuracy": 0.9534883720930233,
+      "sensitivity": 0.9534883720930233,
+      "specificity": 0.0,
+      "auc": null
+    },
+    {
+      "source": "roboflow:oral-cancer-emoot/leukoplakia",
+      "n": 7,
+      "refer": 7,
+      "accuracy": 0.8571428571428571,
+      "sensitivity": 0.8571428571428571,
+      "specificity": 0.0,
+      "auc": null
+    },
+    {
+      "source": "roboflow:oral-dquwv/oralleukoplakia",
+      "n": 39,
+      "refer": 39,
+      "accuracy": 0.9230769230769231,
+      "sensitivity": 0.9230769230769231,
+      "specificity": 0.0,
+      "auc": null
+    },
+    {
+      "source": "salmansajid05/oral-diseases",
+      "n": 42,
+      "refer": 0,
+      "accuracy": 0.9285714285714286,
+      "sensitivity": 0.0,
+      "specificity": 0.9285714285714286,
+      "auc": null
+    },
+    {
+      "source": "zaidpy/oral-cancer-dataset",
+      "n": 191,
+      "refer": 97,
+      "accuracy": 0.9319371727748691,
+      "sensitivity": 0.8969072164948454,
+      "specificity": 0.9680851063829787,
+      "auc": 0.9712656284272866
+    }
+  ]
+}

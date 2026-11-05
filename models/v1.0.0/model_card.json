@@ -1,0 +1,344 @@
+{
+  "model_name": "oralscreen-lesion-triage",
+  "model_version": "1.0.0",
+  "created": "2026-11-04 16:07:19",
+  "pipeline_version": "1.0.0",
+  "intended_use": "Decision support for frontline screening of oral potentially malignant disorders and oral cancer from smartphone photographs. Flags photos that need specialist review.",
+  "not_intended_for": [
+    "diagnosis",
+    "use without a clinician confirming results",
+    "histopathology, X-ray or non-oral images"
+  ],
+  "backbone": "tf_efficientnetv2_s.in21k_ft_in1k",
+  "candidate_selection": [
+    {
+      "key": "effnetv2_s",
+      "auc": 0.9763171759747102,
+      "balanced_accuracy@opt": 0.9456796628029505,
+      "sensitivity@opt": 0.9452054794520548,
+      "specificity@opt": 0.9461538461538461,
+      "best_epoch": 5
+    },
+    {
+      "key": "dinov2_s",
+      "auc": 0.9717070600632245,
+      "balanced_accuracy@opt": 0.9226027397260275,
+      "sensitivity@opt": 0.9452054794520548,
+      "specificity@opt": 0.9,
+      "best_epoch": 7
+    },
+    {
+      "key": "convnext_tiny",
+      "auc": 0.9698893572181242,
+      "balanced_accuracy@opt": 0.9418335089567966,
+      "sensitivity@opt": 0.9452054794520548,
+      "specificity@opt": 0.9384615384615385,
+      "best_epoch": 11
+    },
+    {
+      "key": "dinov2_s_probe",
+      "auc": 0.9338777660695469,
+      "balanced_accuracy@opt": 0.8742887249736565,
+      "sensitivity@opt": 0.9178082191780822,
+      "specificity@opt": 0.8307692307692308,
+      "best_epoch": 0
+    }
+  ],
+  "training_data": {
+    "sources": {
+      "no_refer": {
+        "Teeth_Dataset": 2648,
+        "mohitmural/oral-cancer-lips-and-tongue": 31,
+        "roboflow:aadith/ulcer_detection-12cr0": 102,
+        "roboflow:makhluk/leukoplakia-8woh8": 0,
+        "roboflow:oral-cancer-emoot/leukoplakia": 0,
+        "roboflow:oral-dquwv/oralleukoplakia": 0,
+        "salmansajid05/oral-diseases": 206,
+        "zaidpy/oral-cancer-dataset": 456
+      },
+      "refer": {
+        "Teeth_Dataset": 2229,
+        "mohitmural/oral-cancer-lips-and-tongue": 7,
+        "roboflow:aadith/ulcer_detection-12cr0": 0,
+        "roboflow:makhluk/leukoplakia-8woh8": 214,
+        "roboflow:oral-cancer-emoot/leukoplakia": 35,
+        "roboflow:oral-dquwv/oralleukoplakia": 192,
+        "salmansajid05/oral-diseases": 0,
+        "zaidpy/oral-cancer-dataset": 545
+      }
+    },
+    "deduplication": {
+      "md5": 798,
+      "phash_pairs_confirmed": 2735,
+      "phash_pairs_rejected_by_pixel_check": 120,
+      "embedding_pairs": 1982,
+      "images": 8346,
+      "groups": 6673,
+      "conflicting_groups": 8,
+      "images_in_conflicting_groups": 33,
+      "unique_after_grouping_by_label": {
+        "no_refer": 3443,
+        "refer": 3222
+      },
+      "unique_per_source": {
+        "no_refer": {
+          "Teeth_Dataset": 2648,
+          "mohitmural/oral-cancer-lips-and-tongue": 31,
+          "roboflow:aadith/ulcer_detection-12cr0": 102,
+          "roboflow:makhluk/leukoplakia-8woh8": 0,
+          "roboflow:oral-cancer-emoot/leukoplakia": 0,
+          "roboflow:oral-dquwv/oralleukoplakia": 0,
+          "salmansajid05/oral-diseases": 206,
+          "zaidpy/oral-cancer-dataset": 456
+        },
+        "refer": {
+          "Teeth_Dataset": 2229,
+          "mohitmural/oral-cancer-lips-and-tongue": 7,
+          "roboflow:aadith/ulcer_detection-12cr0": 0,
+          "roboflow:makhluk/leukoplakia-8woh8": 214,
+          "roboflow:oral-cancer-emoot/leukoplakia": 35,
+          "roboflow:oral-dquwv/oralleukoplakia": 192,
+          "salmansajid05/oral-diseases": 0,
+          "zaidpy/oral-cancer-dataset": 545
+        }
+      }
+    },
+    "split_table": [
+      {
+        "split": "calib",
+        "rep": false,
+        "no_refer": 79,
+        "refer": 65
+      },
+      {
+        "split": "calib",
+        "rep": true,
+        "no_refer": 95,
+        "refer": 102
+      },
+      {
+        "split": "dev",
+        "rep": false,
+        "no_refer": 553,
+        "refer": 726
+      },
+      {
+        "split": "dev",
+        "rep": true,
+        "no_refer": 3189,
+        "refer": 2933
+      },
+      {
+        "split": "test",
+        "rep": false,
+        "no_refer": 106,
+        "refer": 119
+      },
+      {
+        "split": "test",
+        "rep": true,
+        "no_refer": 159,
+        "refer": 187
+      }
+    ]
+  },
+  "label_definition": {
+    "refer": "oral cancer / OSCC / malignant / leukoplakia / lichen planus",
+    "no_refer": "normal / non-cancer / benign / canker sores / cold sores / gingivostomatitis / thrush / benign ulcers"
+  },
+  "evaluation": {
+    "held_out_test": {
+      "balanced": {
+        "threshold": 0.7796038109379979,
+        "n": 346,
+        "positives": 187,
+        "accuracy": 0.930635838150289,
+        "balanced_accuracy": 0.9320620186324959,
+        "sensitivity": 0.9144385026737968,
+        "specificity": 0.949685534591195,
+        "ppv": 0.9553072625698324,
+        "npv": 0.9041916167664671,
+        "f1": 0.9344262295081968,
+        "tp": 171,
+        "fp": 8,
+        "tn": 151,
+        "fn": 16,
+        "auc": 0.9687552551037568,
+        "average_precision": 0.962181814913284,
+        "brier": 0.04915126571161459,
+        "ci95": {
+          "accuracy": [
+            0.9017341040462428,
+            0.9566473988439307
+          ],
+          "balanced_accuracy": [
+            0.9048056680866289,
+            0.9586368797611355
+          ],
+          "sensitivity": [
+            0.8709632113084451,
+            0.9521154027024484
+          ],
+          "specificity": [
+            0.9139072847682119,
+            0.9811350235849057
+          ],
+          "f1": [
+            0.9062456837016575,
+            0.96
+          ],
+          "auc": [
+            0.9476574830165375,
+            0.9868390889182813
+          ]
+        }
+      },
+      "screening": {
+        "threshold": 0.7796038109379979,
+        "n": 346,
+        "positives": 187,
+        "accuracy": 0.930635838150289,
+        "balanced_accuracy": 0.9320620186324959,
+        "sensitivity": 0.9144385026737968,
+        "specificity": 0.949685534591195,
+        "ppv": 0.9553072625698324,
+        "npv": 0.9041916167664671,
+        "f1": 0.9344262295081968,
+        "tp": 171,
+        "fp": 8,
+        "tn": 151,
+        "fn": 16,
+        "auc": 0.9687552551037568,
+        "average_precision": 0.962181814913284,
+        "brier": 0.04915126571161459,
+        "ci95": {
+          "accuracy": [
+            0.9017341040462428,
+            0.9566473988439307
+          ],
+          "balanced_accuracy": [
+            0.9048056680866289,
+            0.9586368797611355
+          ],
+          "sensitivity": [
+            0.8709632113084451,
+            0.9521154027024484
+          ],
+          "specificity": [
+            0.9139072847682119,
+            0.9811350235849057
+          ],
+          "f1": [
+            0.9062456837016575,
+            0.96
+          ],
+          "auc": [
+            0.9476574830165375,
+            0.9868390889182813
+          ]
+        }
+      }
+    },
+    "per_source": [
+      {
+        "source": "mohitmural/oral-cancer-lips-and-tongue",
+        "n": 7,
+        "refer": 1,
+        "accuracy": 0.8571428571428571,
+        "sensitivity": 1.0,
+        "specificity": 0.8333333333333334,
+        "auc": 0.8333333333333334
+      },
+      {
+        "source": "roboflow:aadith/ulcer_detection-12cr0",
+        "n": 17,
+        "refer": 0,
+        "accuracy": 0.9411764705882353,
+        "sensitivity": 0.0,
+        "specificity": 0.9411764705882353,
+        "auc": null
+      },
+      {
+        "source": "roboflow:makhluk/leukoplakia-8woh8",
+        "n": 43,
+        "refer": 43,
+        "accuracy": 0.9534883720930233,
+        "sensitivity": 0.9534883720930233,
+        "specificity": 0.0,
+        "auc": null
+      },
+      {
+        "source": "roboflow:oral-cancer-emoot/leukoplakia",
+        "n": 7,
+        "refer": 7,
+        "accuracy": 0.8571428571428571,
+        "sensitivity": 0.8571428571428571,
+        "specificity": 0.0,
+        "auc": null
+      },
+      {
+        "source": "roboflow:oral-dquwv/oralleukoplakia",
+        "n": 39,
+        "refer": 39,
+        "accuracy": 0.9230769230769231,
+        "sensitivity": 0.9230769230769231,
+        "specificity": 0.0,
+        "auc": null
+      },
+      {
+        "source": "salmansajid05/oral-diseases",
+        "n": 42,
+        "refer": 0,
+        "accuracy": 0.9285714285714286,
+        "sensitivity": 0.0,
+        "specificity": 0.9285714285714286,
+        "auc": null
+      },
+      {
+        "source": "zaidpy/oral-cancer-dataset",
+        "n": 191,
+        "refer": 97,
+        "accuracy": 0.9319371727748691,
+        "sensitivity": 0.8969072164948454,
+        "specificity": 0.9680851063829787,
+        "auc": 0.9712656284272866
+      }
+    ],
+    "calibration_ece": 0.026928072314840734,
+    "cross_validation": {
+      "auc": {
+        "mean": 0.9722833946909528,
+        "std": 0.007201660713576769
+      },
+      "balanced_accuracy": {
+        "mean": 0.9313357808118325,
+        "std": 0.01879903473842108
+      },
+      "sensitivity": {
+        "mean": 0.9348430458504872,
+        "std": 0.030651132598327836
+      },
+      "specificity": {
+        "mean": 0.927828515773178,
+        "std": 0.0478889219073241
+      }
+    }
+  },
+  "operating_points": {
+    "balanced": 0.7796038109379979,
+    "screening": 0.7796038109379979
+  },
+  "calibration": {
+    "a": 1.279500368491418,
+    "c": 0.4986577613335471
+  },
+  "limitations": [
+    "Trained on open datasets of uncertain provenance and licence; images were deduplicated but labels were taken as provided by the sources.",
+    "No patient identifiers were available; near-duplicate grouping approximates patient-level splitting.",
+    "Not validated prospectively, and not validated on photographs taken by community health workers in Dakshina Kannada/Udupi.",
+    "Some lesion types or mouth sites may be under-represented; see per-source results.",
+    "Performance can drop on poor-quality photos — the app's quality gate must run first."
+  ],
+  "ethical_considerations": "Output is a screening aid; every 'refer' result must be reviewed by a specialist. Never present as a diagnosis.",
+  "contract": "model_contract.json"
+}

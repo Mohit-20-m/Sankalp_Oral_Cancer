@@ -1,0 +1,46 @@
+source,folder,label,reason,images
+Teeth_Dataset,Testing/CaS,no_refer,exact folder 'cas',160
+Teeth_Dataset,Testing/CoS,no_refer,exact folder 'cos',149
+Teeth_Dataset,Testing/Gum,no_refer,exact folder 'gum',120
+Teeth_Dataset,Testing/MC,refer,exact folder 'mc',180
+Teeth_Dataset,Testing/OC,refer,exact folder 'oc',108
+Teeth_Dataset,Testing/OLP,refer,exact folder 'olp',180
+Teeth_Dataset,Testing/OT,no_refer,exact folder 'ot',131
+Teeth_Dataset,Training/CaS,no_refer,exact folder 'cas',480
+Teeth_Dataset,Training/CoS,no_refer,exact folder 'cos',450
+Teeth_Dataset,Training/Gum,no_refer,exact folder 'gum',360
+Teeth_Dataset,Training/MC,refer,exact folder 'mc',540
+Teeth_Dataset,Training/OC,refer,exact folder 'oc',324
+Teeth_Dataset,Training/OLP,refer,exact folder 'olp',540
+Teeth_Dataset,Training/OT,no_refer,exact folder 'ot',393
+Teeth_Dataset,Validation/CaS,no_refer,exact folder 'cas',160
+Teeth_Dataset,Validation/CoS,no_refer,exact folder 'cos',149
+Teeth_Dataset,Validation/Gum,no_refer,exact folder 'gum',120
+Teeth_Dataset,Validation/MC,refer,exact folder 'mc',180
+Teeth_Dataset,Validation/OC,refer,exact folder 'oc',108
+Teeth_Dataset,Validation/OLP,refer,exact folder 'olp',180
+Teeth_Dataset,Validation/OT,no_refer,exact folder 'ot',131
+mohitmural/oral-cancer-lips-and-tongue,OralCancer/cancer,refer,refer keyword 'cancer' in 'cancer',87
+mohitmural/oral-cancer-lips-and-tongue,OralCancer/non-cancer,no_refer,no_refer keyword 'non cancer' in 'non cancer',44
+roboflow:aadith/ulcer_detection-12cr0,train/images,no_refer,roboflow project label (recurrent aphthous ulcers (benign)),384
+roboflow:makhluk/leukoplakia-8woh8,test/images,refer,roboflow project label (oral leukoplakia),9
+roboflow:makhluk/leukoplakia-8woh8,train/images,refer,roboflow project label (oral leukoplakia),204
+roboflow:makhluk/leukoplakia-8woh8,valid/images,refer,roboflow project label (oral leukoplakia),19
+roboflow:oral-cancer-emoot/leukoplakia,train/images,refer,roboflow project label (oral leukoplakia),60
+roboflow:oral-cancer-emoot/leukoplakia,valid/images,refer,roboflow project label (oral leukoplakia),14
+roboflow:oral-dquwv/oralleukoplakia,train/images,refer,roboflow project label (oral leukoplakia),417
+salmansajid05/oral-diseases,Calculus/Calculus,excluded,exclude keyword 'calculus',1296
+salmansajid05/oral-diseases,Caries_Gingivitus_ToothDiscoloration_Ulcer-yolo_annotated-Dataset/Caries_Gingivitus_ToothDiscoloration_Ulcer-yolo_annotated-Dataset/Data/images/train,excluded,exclude keyword 'caries',1493
+salmansajid05/oral-diseases,Caries_Gingivitus_ToothDiscoloration_Ulcer-yolo_annotated-Dataset/Caries_Gingivitus_ToothDiscoloration_Ulcer-yolo_annotated-Dataset/Data/images/val,excluded,exclude keyword 'caries',49
+salmansajid05/oral-diseases,Data caries/Data caries/caries augmented data set/preview,excluded,exclude keyword 'caries',2382
+salmansajid05/oral-diseases,Data caries/Data caries/caries orignal data set/done,excluded,exclude keyword 'caries',219
+salmansajid05/oral-diseases,Gingivitis/Gingivitis,excluded,exclude keyword 'gingivitis',2349
+salmansajid05/oral-diseases,Mouth Ulcer/Mouth Ulcer/Mouth_Ulcer_augmented_DataSet/preview,excluded,exclude keyword 'augmented',2541
+salmansajid05/oral-diseases,Mouth Ulcer/Mouth Ulcer/ulcer original dataset/ulcer original dataset,no_refer,no_refer keyword 'mouth ulcer' in 'mouth ulcer',265
+salmansajid05/oral-diseases,Tooth Discoloration/Tooth Discoloration /Tooth_discoloration_augmented_dataser/preview,excluded,exclude keyword 'tooth discoloration',1834
+salmansajid05/oral-diseases,Tooth Discoloration/Tooth Discoloration /tooth discoloration original dataset/tooth discoloration original dataset,excluded,exclude keyword 'tooth discoloration',183
+salmansajid05/oral-diseases,hypodontia/hypodontia,excluded,exclude keyword 'hypodontia',1251
+zaidpy/oral-cancer-dataset,Oral Cancer/Oral Cancer Dataset/CANCER,refer,refer keyword 'cancer' in 'cancer',500
+zaidpy/oral-cancer-dataset,Oral Cancer/Oral Cancer Dataset/NON CANCER,no_refer,no_refer keyword 'non cancer' in 'non cancer',250
+zaidpy/oral-cancer-dataset,Oral cancer Dataset 2.0/OC Dataset kaggle new/CANCER,refer,refer keyword 'cancer' in 'cancer',500
+zaidpy/oral-cancer-dataset,Oral cancer Dataset 2.0/OC Dataset kaggle new/NON CANCER,no_refer,no_refer keyword 'non cancer' in 'non cancer',450
