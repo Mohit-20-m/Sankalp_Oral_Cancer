@@ -12,6 +12,6 @@ matplotlib
 pyyaml
 pillow
 imagehash>=4.3
-onnx>=1.14
+onnx>=1.23.2
 onnxruntime>=1.16
 roboflow
