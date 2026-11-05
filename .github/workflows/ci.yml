@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  training:
+    name: Training pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install linters
+        run: pip install ruff==0.13.3
+      - name: Lint (syntax errors, undefined names)
+        run: ruff check training --select E9,F --ignore F401,F841
+      - name: Byte-compile
+        run: python -m compileall -q training
+
+  artefacts:
+    name: Model metadata, notebook, scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate model contract and card
+        run: |
+          python - <<'EOF'
+          import json, pathlib, sys
+          root = pathlib.Path("models/v1.0.0")
+          contract = json.loads((root / "model_contract.json").read_text())
+          card = json.loads((root / "model_card.json").read_text())
+          need = {"model_version", "backbone", "files", "input", "decision", "ood_file"}
+          missing = need - contract.keys()
+          assert not missing, f"contract is missing {missing}"
+          assert contract["model_version"] == card["model_version"], "card and contract versions differ"
+          thr = contract["decision"]["thresholds"]["screening"]
+          assert 0 < thr < 1, "screening threshold out of range"
+          for p in root.rglob("*.json"):
+              json.loads(p.read_text())
+          print(f"model {contract['model_version']} ({contract['backbone']}), screening threshold {thr:.3f}: ok")
+          EOF
+      - name: Validate notebook
+        run: |
+          pip install nbformat==5.10.4
+          python -c "import nbformat, glob; [nbformat.validate(nbformat.read(p, as_version=4)) or print('valid:', p) for p in glob.glob('notebooks/*.ipynb')]"
+      - name: Shellcheck
+        run: shellcheck scripts/*.sh
