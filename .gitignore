@@ -1,0 +1,55 @@
+# ── secrets & local config ──────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── model artefacts (published as GitHub Release assets, see scripts/fetch-model.sh) ──
+models/current/
+models/heads/
+models/state.json
+*.onnx
+*.pt
+*.pth
+*.npz
+*.npy
+*.task
+!web/public/mediapipe/face_landmarker.task
+
+# ── datasets & training outputs (never committed: licences of the source datasets vary) ──
+data/
+datasets/
+image_cache/
+artifacts/
+*.tar.gz
+*.zip
+manifest_*.csv
+manifest_*.pkl
+
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+celerybeat-schedule*
+
+# ── Node / web ──────────────────────────────────────────
+node_modules/
+dist/
+*.tsbuildinfo
+web/public/mediapipe/wasm/
+
+# ── OS / editors ────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.log

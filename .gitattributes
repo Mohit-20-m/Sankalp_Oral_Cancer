@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+# binaries
+*.png  binary
+*.jpg  binary
+*.task binary
+*.onnx binary
+
+# keep notebooks out of the language statistics
+*.ipynb linguist-documentation
