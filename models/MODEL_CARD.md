@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Task** | Binary triage of an intra-oral photograph: **refer** (suspicious — needs a specialist) vs **no_refer** |
+| **Task** | Binary triage of an intra-oral photograph: **refer** (suspicious - needs a specialist) vs **no_refer** |
 | **Architecture** | EfficientNetV2-S (`tf_efficientnetv2_s.in21k_ft_in1k`, timm) + linear head with class-activation maps |
 | **Input** | RGB, EXIF-corrected, letterboxed to 224 × 224 (pad RGB 124,116,104), ImageNet mean/std |
 | **Output** | Calibrated probability of *refer*, 1280-d embedding, 7 × 7 heat map |
