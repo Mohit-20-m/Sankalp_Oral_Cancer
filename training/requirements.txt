@@ -11,7 +11,7 @@ numpy
 matplotlib
 pyyaml
 pillow
-imagehash>=4.3
+imagehash>=4.3.2
 onnx>=1.14
 onnxruntime>=1.16
 roboflow
