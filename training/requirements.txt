@@ -3,7 +3,7 @@
 torch>=2.1
 torchvision
 timm>=0.9.12
-albumentations>=1.3
+albumentations>=2.0.8
 opencv-python-headless
 scikit-learn>=1.2
 pandas
