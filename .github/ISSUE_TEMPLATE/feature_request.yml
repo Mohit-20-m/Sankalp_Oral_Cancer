@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement or a new capability
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem would this solve, and for whom (ASHA worker, specialist, developer, researcher)?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Patient-safety considerations
+      description: Could this change cause a missed lesion, a wrong referral, or expose patient data?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
