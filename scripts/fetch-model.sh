@@ -5,16 +5,16 @@
 #   ./scripts/fetch-model.sh --with-checkpoint  # + PyTorch checkpoint (for fine-tuning) into models/checkpoints/
 #   ./scripts/fetch-model.sh --force            # re-download even if models/current/ is already this version
 #
-# Environment overrides: SANKALP_REPO (owner/name), SANKALP_MODEL_TAG (release tag), SANKALP_MODEL_VERSION,
-# SANKALP_MODEL_BASE_URL (download from a mirror instead of GitHub Releases).
+# Environment overrides: AROGYA_REPO (owner/name), AROGYA_MODEL_TAG (release tag), AROGYA_MODEL_VERSION,
+# AROGYA_MODEL_BASE_URL (download from a mirror instead of GitHub Releases).
 set -euo pipefail
 
-REPO="${SANKALP_REPO:-Mohit-20-m/Sankalp_Oral_Cancer}"
-TAG="${SANKALP_MODEL_TAG:-v0.1.0}"
-VERSION="${SANKALP_MODEL_VERSION:-1.0.0}"
+REPO="${AROGYA_REPO:-Mohit-20-m/Sankalp_Oral_Cancer}"
+TAG="${AROGYA_MODEL_TAG:-v0.1.0}"
+VERSION="${AROGYA_MODEL_VERSION:-1.0.0}"
 BUNDLE="sankalp-model-${VERSION}.zip"
 CHECKPOINT="lesion_model-${VERSION}.pt"
-BASE="${SANKALP_MODEL_BASE_URL:-https://github.com/${REPO}/releases/download/${TAG}}"   # override for a mirror
+BASE="${AROGYA_MODEL_BASE_URL:-https://github.com/${REPO}/releases/download/${TAG}}"   # override for a mirror
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODELS="${ROOT}/models"

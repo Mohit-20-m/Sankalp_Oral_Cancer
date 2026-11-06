@@ -1,6 +1,6 @@
 # Training pipeline - lesion triage model
 
-This package trains Sankalp's **refer / no-refer** model for intra-oral photographs and exports everything the
+This package trains Arogya's **refer / no-refer** model for intra-oral photographs and exports everything the
 backend needs to run it. It runs end to end on a free Kaggle GPU (2 × T4) with one click (**Run All**), either
 through the notebook in [`../notebooks`](../notebooks) or from the command line:
 
@@ -32,7 +32,7 @@ The selected backbone and its results are documented in [`../models/MODEL_CARD.m
 
 1. **Upload the code** - zip this folder and create a private Kaggle Dataset from it named `oralscreen-code`.
 2. **Create a notebook** - *File → Import Notebook* →
-   [`notebooks/sankalp_training_kaggle.ipynb`](../notebooks/sankalp_training_kaggle.ipynb).
+   [`notebooks/arogya_training_kaggle.ipynb`](../notebooks/arogya_training_kaggle.ipynb).
 3. **Settings** - Accelerator *GPU T4 × 2*, Internet *on* (pretrained backbones are downloaded from `timm`).
 4. **Add the data** (*Add Data* → search):
 

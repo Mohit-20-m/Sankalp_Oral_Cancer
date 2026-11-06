@@ -1,6 +1,6 @@
-# Contributing to Sankalp
+# Contributing to Arogya
 
-Thanks for your interest! Sankalp is a health-screening project, so correctness and patient safety come before
+Thanks for your interest! Arogya is a health-screening project, so correctness and patient safety come before
 speed. Please read this short guide before opening a pull request.
 
 ## Ways to help

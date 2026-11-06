@@ -1,6 +1,6 @@
 # Security policy
 
-Sankalp handles health information, so we take security and privacy reports seriously.
+Arogya handles health information, so we take security and privacy reports seriously.
 
 ## Reporting a vulnerability
 

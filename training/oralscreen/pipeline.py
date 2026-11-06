@@ -45,7 +45,7 @@ class Pipeline:
         seed_everything(cfg["project"]["seed"])
         self.device = get_device(cfg["train"].get("device", "auto"))
         self.size = cfg["data"]["image_size"]
-        LOG.info("Sankalp training v%s | torch %s | device %s | python %s", __version__, torch.__version__,
+        LOG.info("Arogya training v%s | torch %s | device %s | python %s", __version__, torch.__version__,
                  self.device, platform.python_version())
 
     # ------------------------------------------------------------------ io
@@ -414,7 +414,7 @@ class Pipeline:
             getattr(self, st)()
 
 
-ARTIFACT_README = """# Sankalp model artifacts
+ARTIFACT_README = """# Arogya model artifacts
 
 Drop this folder's contents into the backend's `models/current/` directory.
 
@@ -437,7 +437,7 @@ Use `prob >= thresholds.screening` as the default "refer" rule. Screening aid on
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Sankalp training pipeline")
+    ap = argparse.ArgumentParser(description="Arogya training pipeline")
     ap.add_argument("--config", default="config.yaml")
     ap.add_argument("--stage", default="all", help=f"one of {STAGES}, comma list, or 'all'")
     ap.add_argument("--from-stage", default=None, help="run from this stage to the end")
