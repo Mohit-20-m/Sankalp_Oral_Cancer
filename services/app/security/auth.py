@@ -99,7 +99,7 @@ def mint_local_token(username: str, role: str, facility_id: str | None, user_id:
 def _principal_from_claims(claims: dict) -> Principal:
     roles = [r for r in (claims.get("realm_access") or {}).get("roles", []) if r in STAFF_ROLES]
     if not roles:
-        raise HTTPException(403, "no Sankalp role assigned to this account")
+        raise HTTPException(403, "no Arogya role assigned to this account")
     role = next(r for r in ROLE_PRIORITY if r in roles)
     fac = claims.get("facility_id") or None
     if isinstance(fac, list):

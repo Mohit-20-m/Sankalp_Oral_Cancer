@@ -1,4 +1,4 @@
-"""OralScreen API — FastAPI application factory."""
+"""Arogya API - FastAPI application factory."""
 from __future__ import annotations
 
 import time
@@ -16,7 +16,7 @@ from ..secrets import load_secrets
 from .routers import clinical, oversight, patients, screenings, system, web
 
 DESCRIPTION = """
-**Sankalp** - AI-assisted oral pre-cancer screening and care-continuity platform.
+**Arogya** - AI-assisted oral pre-cancer screening and care-continuity platform.
 
 *Screening aid only — not a diagnosis. A specialist confirms every high-risk result.*
 
@@ -32,7 +32,7 @@ tags = [{"name": t} for t in ("system", "patients & care continuity", "screening
 def create_app() -> FastAPI:
     cfg = get_settings()
     setup_logging("oralscreen-api")
-    app = FastAPI(title="Sankalp API", version="2.0.0", description=DESCRIPTION, openapi_tags=tags,
+    app = FastAPI(title="Arogya API", version="2.0.0", description=DESCRIPTION, openapi_tags=tags,
                   docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json")
     app.add_middleware(CORSMiddleware, allow_origins=cfg.cors_origins, allow_methods=["*"], allow_headers=["*"],
                        expose_headers=["X-Request-ID"])

@@ -13,6 +13,8 @@ _MAP = {
     "twilio_account_sid": "twilio_account_sid",
     "twilio_auth_token": "twilio_auth_token",
     "twilio_from_number": "twilio_from_number",
+    "twilio_api_key_sid": "twilio_api_key_sid",
+    "twilio_api_key_secret": "twilio_api_key_secret",
     "s3_secret_key": "s3_secret_key",
 }
 

@@ -61,7 +61,8 @@ def vault_secrets() -> None:
         current = {}
     new = dict(current)
     new.setdefault("signing_secret", secrets.token_urlsafe(48))
-    for k in ("twilio_account_sid", "twilio_auth_token", "twilio_from_number"):
+    for k in ("twilio_account_sid", "twilio_auth_token", "twilio_from_number", "twilio_api_key_sid",
+              "twilio_api_key_secret"):
         v = os.environ.get(f"OS_{k.upper()}", "")
         if v:
             new[k] = v

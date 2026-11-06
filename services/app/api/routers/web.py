@@ -129,7 +129,7 @@ async def history(pid: uuid.UUID, c: Ctx = Depends(ctx)):
 
 # ───────────────────────── referrals ─────────────────────────
 _REF_SQL = """
-SELECT r.id, r.status, r.due_by, r.created_at, r.patient_id, p.full_name, f.name AS facility, s.risk_level,
+SELECT r.id, r.status, r.due_by, r.booked_for, r.created_at, r.patient_id, p.full_name, f.name AS facility, s.risk_level,
        EXISTS (SELECT 1 FROM messages m WHERE m.template = 'referral_patient'
                AND m.related->>'referral_id' = CAST(r.id AS text)) AS sms
 FROM referrals r JOIN patients p ON p.id = r.patient_id JOIN facilities f ON f.id = r.facility_id
@@ -141,7 +141,8 @@ WHERE true {where} ORDER BY r.created_at DESC LIMIT 200
 def _ref(r) -> dict:
     return {"id": str(r.id), "code": ref_code(r.id), "patientId": str(r.patient_id), "patientName": r.full_name,
             "facility": r.facility, "visitBy": r.due_by, "status": _ref_status(r.status, r.due_by),
-            "issuedAt": r.created_at, "risk": r.risk_level or "HIGH", "smsSent": bool(r.sms)}
+            "issuedAt": r.created_at, "risk": r.risk_level or "HIGH", "smsSent": bool(r.sms),
+            "bookedFor": r.booked_for, "apiStatus": r.status}
 
 
 @router.get("/referrals")

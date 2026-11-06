@@ -23,7 +23,7 @@ SUPPORTING_SIGNS = {"habit_high": "high-risk habits", "patch_noticed": "patch no
                     "burning": "burning sensation", "previous_high": "previous high-risk screening"}
 
 DEFAULT_RULE_SET: dict = {
-    "name": "Sankalp default triage rules",
+    "name": "Arogya default triage rules",
     "habit_scoring": {
         "weights": {"tobacco": 3, "alcohol": 2, "areca": 2, "years_over_10": 1, "burning": 2,
                     "difficulty_opening": 1},

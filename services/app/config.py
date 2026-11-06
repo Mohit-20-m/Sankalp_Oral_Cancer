@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     messaging_mode: Literal["twilio", "sandbox"] = "sandbox"
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
+    twilio_api_key_sid: str = ""              # optional: API key (SK...) + secret instead of the auth token
+    twilio_api_key_secret: str = ""
+    # Twilio TRIAL accounts reject custom SMS text (error 572006) and only send Twilio's predefined templates.
+    # For demos: send the closest predefined template instead; the full Arogya text is still stored and shown in admin.
+    twilio_trial_templates: bool = False
     twilio_from_number: str = ""
     twilio_validate_signatures: bool = True
     public_webhook_base: str = ""             # e.g. https://<ngrok-id>.ngrok-free.app (needed for IVR)

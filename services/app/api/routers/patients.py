@@ -333,7 +333,7 @@ async def issue_card(pid: uuid.UUID, c: Ctx = Depends(ctx)):
         link = f"{get_settings().public_base_url}/connect?card={token}"
         return {"card_id": str(card.id), "display_id": p.display_id, "token": token, "link": link,
                 "qr_png_base64": qr_png_base64(link),
-                "printed_text": f"Sankalp Mouth Health Card · {p.display_id} · Show this to any doctor you visit"}
+                "printed_text": f"Arogya Mouth Health Card · {p.display_id} · Show this to any doctor you visit"}
 
 
 @router.post("/provider-connect/request")

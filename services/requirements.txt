@@ -1,4 +1,4 @@
-# Sankalp backend - one shared image for api, worker, relay, inference and bootstrap.
+# Arogya backend - one shared image for api, worker, relay, inference and bootstrap.
 # Versions pinned to the set verified end-to-end (Nov 2026).
 fastapi==0.162.0
 starlette==1.6.0

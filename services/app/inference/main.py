@@ -23,7 +23,7 @@ from ..ml.bundle import ModelBundle
 from ..observability import log, setup_logging, setup_tracing
 
 setup_logging("oralscreen-inference")
-app = FastAPI(title="Sankalp inference", version="2.0.0")
+app = FastAPI(title="Arogya inference", version="2.0.0")
 Instrumentator().instrument(app).expose(app, include_in_schema=False)
 setup_tracing("oralscreen-inference", fastapi_app=app)
 

@@ -82,20 +82,37 @@ async def referral_status(rid: uuid.UUID, body: ReferralStatusIn, c: Ctx = Depen
         r = await s.get(Referral, rid)
         if r is None:
             raise HTTPException(404, "referral not found")
-        allowed = {"pending": {"booked", "visited", "cancelled"}, "booked": {"visited", "cancelled"},
+        allowed = {"pending": {"booked", "visited", "cancelled"}, "booked": {"booked", "visited", "cancelled"},
                    "visited": {"completed"}, "completed": set(), "cancelled": set()}
         if body.status not in allowed[r.status]:
             raise HTTPException(409, f"cannot go from {r.status} to {body.status}")
         now = datetime.now(timezone.utc)
-        r.status = body.status
+        rescheduled, ist = False, None
         if body.status == "booked":
-            r.booked_for = body.booked_for
+            if body.booked_for is None:
+                raise HTTPException(422, "choose the appointment date and time")
+            when = body.booked_for if body.booked_for.tzinfo else body.booked_for.replace(tzinfo=timezone.utc)
+            if when < now - timedelta(hours=1):
+                raise HTTPException(422, "the appointment cannot be in the past")
+            rescheduled = r.status == "booked"
+            r.booked_for = when
+            p = await s.get(Patient, r.patient_id)
+            fac = await s.get(Facility, r.facility_id)
+            ist = when.astimezone(timezone(timedelta(hours=5, minutes=30)))       # patients read local time
+            if p and p.phone:
+                await s.run_sync(lambda ss: queue_sms(
+                    ss, p.phone, "appointment_booked", p.language, patient_id=p.id,
+                    related={"referral_id": str(rid)}, facility=fac.name if fac else "the clinic",
+                    when=ist.strftime("%d %b %Y, %I:%M %p")))
+        r.status = body.status
         if body.status == "visited":
             r.visited_at = now
         if body.status == "completed":
             r.completed_at, r.outcome = now, {**(r.outcome or {}), **(body.outcome or {})}
         s.add(TimelineEvent(patient_id=r.patient_id, occurred_at=now, kind="referral", source=c.p.role,
-                            summary=f"Referral {body.status}", data={"referral_id": str(rid), **(body.outcome or {})},
+                            summary=(f"Appointment {'rescheduled' if rescheduled else 'booked'} for "
+                                     f"{ist.strftime('%d %b %Y, %I:%M %p')}" if body.status == "booked"
+                                     else f"Referral {body.status}"), data={"referral_id": str(rid), **(body.outcome or {})},
                             created_by=c.p.username))
         await c.audit(s, f"referral.{body.status}", "referral", rid, r.patient_id, body.outcome or {})
         return _ref_out(r)

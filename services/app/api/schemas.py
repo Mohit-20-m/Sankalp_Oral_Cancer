@@ -5,9 +5,26 @@ import uuid
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 Site = Literal["left_buccal", "right_buccal", "tongue_dorsum", "tongue_ventral", "gums", "palate", "front_open"]
+
+
+def e164_india(v: str | None) -> str | None:
+    """Store phone numbers in E.164 so SMS gateways accept them. A plain 10-digit Indian mobile number
+    (optionally with a leading 0 or 91) becomes +91XXXXXXXXXX; numbers already starting with + are kept."""
+    if v is None or v == "":
+        return None
+    d = "".join(ch for ch in str(v) if ch.isdigit() or ch == "+")
+    if d.startswith("+"):
+        return d
+    if len(d) == 11 and d.startswith("0"):
+        d = d[1:]
+    if len(d) == 10:
+        return "+91" + d
+    if len(d) == 12 and d.startswith("91"):
+        return "+" + d
+    return "+" + d
 
 
 class PatientIn(BaseModel):
@@ -19,6 +36,11 @@ class PatientIn(BaseModel):
     village_id: uuid.UUID | None = None
     abha_id: str | None = Field(default=None, max_length=20)
 
+    @field_validator("phone")
+    @classmethod
+    def _phone(cls, v):
+        return e164_india(v)
+
 
 class PatientPatch(BaseModel):
     full_name: str | None = None
@@ -26,6 +48,11 @@ class PatientPatch(BaseModel):
     language: Literal["kn", "tcy", "en"] | None = None
     village_id: uuid.UUID | None = None
     abha_id: str | None = None
+
+    @field_validator("phone")
+    @classmethod
+    def _phone(cls, v):
+        return e164_india(v)
 
 
 class ConsentIn(BaseModel):
@@ -135,6 +162,11 @@ class ProviderRequestIn(BaseModel):
     provider_name: str = Field(min_length=2, max_length=160)
     provider_phone: str = Field(pattern=r"^\+?[0-9]{10,15}$")
     provider_reg_no: str | None = None
+
+    @field_validator("provider_phone")
+    @classmethod
+    def _phone(cls, v):
+        return e164_india(v)
 
 
 class ProviderVerifyIn(BaseModel):

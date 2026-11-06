@@ -142,7 +142,7 @@ def audit_event(a) -> dict:
            "action": "R" if a.action.startswith(("read", "view")) else "C" if "create" in a.action else "U",
            "recorded": _ts(a.ts), "outcome": "0",
            "agent": [{"who": {"display": f"{a.actor_role}:{a.actor_id}"}, "requestor": True}],
-           "source": {"observer": {"display": "Sankalp API"}},
+           "source": {"observer": {"display": "Arogya API"}},
            "entity": [{"what": {"display": f"{a.entity_type}/{a.entity_id}"},
                        "detail": [{"type": "hash", "valueString": a.hash}]}]}
     return AuditEvent.model_validate(res).model_dump(mode="json", exclude_none=True)
@@ -160,7 +160,7 @@ def capability_statement() -> dict:
              "Consent", "AuditEvent"]
     res = {"resourceType": "CapabilityStatement", "status": "active", "date": _ts(datetime.now(timezone.utc)),
            "kind": "instance", "fhirVersion": "4.3.0", "format": ["json"],
-           "software": {"name": "Sankalp FHIR facade"},
+           "software": {"name": "Arogya FHIR facade"},
            "rest": [{"mode": "server", "resource": [{"type": t, "interaction": [{"code": "read"},
                                                                                {"code": "search-type"}]}
                                                     for t in types]}]}
