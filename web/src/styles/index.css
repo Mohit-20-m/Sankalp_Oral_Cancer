@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Defaults mirror src/config/branding.ts; they're overwritten at startup. */
+:root {
+  --c-primary: 47 107 79;
+  --c-primary-deep: 22 53 42;
+  --c-secondary: 220 235 221;
+  --c-accent: 214 236 140;
+  --c-bg: 246 243 234;
+  --c-surface: 255 255 255;
+  --c-ink: 26 38 32;
+  --text-scale: 1;
+  color-scheme: light;
+}
+
+html {
+  font-size: calc(16px * var(--text-scale));
+}
+
+/* High-contrast mode — toggled from Settings. */
+html[data-contrast="high"] {
+  --c-ink: 0 0 0;
+  --c-bg: 255 255 255;
+  --c-primary: 18 74 48;
+}
+html[data-contrast="high"] .shadow-soft,
+html[data-contrast="high"] .shadow-lift {
+  box-shadow: 0 0 0 1.5px rgb(0 0 0 / 0.8);
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+  /* Kannada script needs extra line-height to avoid clipping. */
+  :lang(kn), :lang(tcy) {
+    line-height: 1.6;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-bg;
+  }
+  ::selection {
+    background: rgb(var(--c-accent));
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-3xl bg-surface shadow-soft;
+  }
+  .label-eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.12em] text-ink-mute;
+  }
+  .num {
+    @apply font-display tabular-nums tracking-tight;
+  }
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-ink) / 0.15) transparent;
+  }
+  .dot-grid {
+    background-image: radial-gradient(rgb(var(--c-ink) / 0.08) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) *,
+  html:not([data-motion="full"]) *::before,
+  html:not([data-motion="full"]) *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
