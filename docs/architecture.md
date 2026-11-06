@@ -1,6 +1,6 @@
 # Architecture
 
-Sankalp's backend is a set of small services started together with Docker Compose. It receives screenings from
+Arogya's backend is a set of small services started together with Docker Compose. It receives screenings from
 the field, checks photo quality, runs the lesion model, applies versioned clinical rules, and then drives the care
 pathway (referral, SMS, specialist review, follow-up) until the patient has been seen.
 
@@ -30,6 +30,7 @@ flowchart LR
 
 | Service | Technology | Responsibility |
 |---|---|---|
+| `web` | React + TypeScript, nginx | Browser app for every role; on-device photo quality checks and MediaPipe face landmarks for mouth opening |
 | `traefik` | Traefik 3 | Single HTTPS entry point; routes `/api`, `/auth` and storage links; rate limits and security headers |
 | `api`, `api-2` | FastAPI, SQLAlchemy | REST API (about 100 endpoints), two replicas so one can fail without downtime |
 | `worker` | Celery + beat | Screening pipeline, SMS and voice, OCR, check-ins, follow-ups, retraining, drift and fairness reports, audit snapshots |
@@ -45,6 +46,19 @@ flowchart LR
 
 Optional profiles add Grafana/Prometheus/Tempo/Loki (`monitoring`), MLflow and Flower (`mlops`), a HAPI FHIR server
 (`hapi`) and an ngrok tunnel for Twilio webhooks (`tunnel`).
+
+## Web app
+
+The React application ([`web/`](../web)) talks to the API under the same origin. Two pieces of clinical logic run
+in the browser so problems are caught while the patient is still present:
+
+- **Photo quality gate** with exactly the server's algorithm and thresholds (sharpness, exposure, glare,
+  mouth-tissue colour), so a photo accepted at capture is accepted by the server.
+- **Mouth-opening measurement** with MediaPipe Face Landmarker (bundled, offline): both irises (about 11.7 mm) are
+  the ruler for the inner-lip distance; the worker can adjust the points, and the raw pixel readings are sent so the
+  server recomputes and validates the millimetres.
+
+Routes are guarded by role in the app and enforced again by the API.
 
 ## Screening pipeline
 
@@ -77,8 +91,9 @@ Optional profiles add Grafana/Prometheus/Tempo/Loki (`monitoring`), MLflow and F
 - **Timeline.** Every screening, symptom report, medicine, referral, check-in reply and review is a timeline event.
   The rules read it (for example, how long a patch has been present, or whether symptoms returned).
 - **Check-ins.** SMS or voice calls (Twilio) ask whether symptoms are back; a "yes" re-evaluates the patient.
-- **Referrals.** Signed QR referral slips are scanned at the facility; forged tokens are rejected. Overdue
-  referrals trigger reminders.
+- **Referrals.** Signed QR referral slips are scanned at the facility; forged tokens are rejected. Staff book or
+  reschedule an appointment (date and time), which is sent to the patient by SMS. Overdue referrals trigger
+  reminders.
 - **Provider Connect.** A local doctor scans the patient's health card; the patient receives a one-time code and
   only after they share it can the doctor read that patient's summary.
 

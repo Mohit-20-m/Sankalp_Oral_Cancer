@@ -6,6 +6,37 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-06
+
+The web application, and the product name **Arogya**.
+
+### Added
+- Web app (React, TypeScript, Vite) for every role: ASHA worker and nurse screening wizard, patient records,
+  specialist review queue and case view with heat maps, referral desk, Provider Connect, district insights,
+  model and rule governance for clinical leads, administration (health, audit, messages), settings; English,
+  Kannada and Tulu.
+- Seven-site photo capture by phone (QR-linked), webcam or upload, with live quality checks that use exactly the
+  server's algorithm and thresholds.
+- Automatic mouth-opening measurement on device with MediaPipe Face Landmarker (bundled, offline): both irises as
+  the ruler, adjustable points, head-pose warning; raw readings are re-validated by the server.
+- Retake panel on the result screen for flagged or unusable sites.
+- Referral appointments: book or reschedule a date and time at the referral desk; the patient is notified by SMS.
+- Twilio API-key authentication and a trial-template mode for demos on Twilio trial accounts.
+- Phone numbers are normalised to E.164 (`+91` for 10-digit Indian mobile numbers).
+- Arogya logo, favicon and app icon; screenshots and staff-account guide in the documentation.
+- CI: web type-check and production build.
+
+### Changed
+- Product renamed from Sankalp to Arogya (code, documentation and patient messages).
+- Server photo-quality sharpness cut-off calibrated on the clinical benchmark (15 instead of 60); unclear photos
+  with a low score now count as low, high scores on unclear photos go to retake and specialist review.
+
+### Fixed
+- Keycloak admin console failed to load because the gateway denied same-origin framing.
+- Empty values followed by comments in `.env` were read as the comment text by Docker Compose; the template now
+  keeps comments on their own lines.
+- Referral desk offered "Mark booked" again for overdue booked referrals, which the API rejected.
+
 ## [0.2.0] - 2026-11-05
 
 The backend platform.
@@ -43,6 +74,7 @@ First public release: the lesion triage model.
 - Release assets: model bundle and PyTorch checkpoint, with `scripts/fetch-model.sh` for verified download.
 - CI: training-code lint, model-metadata and notebook validation, shellcheck.
 
-[Unreleased]: https://github.com/Mohit-20-m/Sankalp_Oral_Cancer/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Mohit-20-m/Sankalp_Oral_Cancer/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/Mohit-20-m/Sankalp_Oral_Cancer/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Mohit-20-m/Sankalp_Oral_Cancer/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Mohit-20-m/Sankalp_Oral_Cancer/releases/tag/v0.1.0

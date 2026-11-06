@@ -1,6 +1,6 @@
 <div align="center">
 
-# Sankalp
+<img src="web/public/brand/logo-full.png" alt="Arogya - AI-powered oral pre-cancer screening and early detection" width="460">
 
 **AI-assisted early detection of oral cancer for frontline health workers**
 
@@ -10,6 +10,8 @@
 ![python](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)
 ![pytorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)
 ![onnx](https://img.shields.io/badge/ONNX-INT8-005CED?logo=onnx&logoColor=white)
+![react](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![typescript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
 *Screening aid only - not a diagnostic device. A specialist confirms every high-risk result.*
 
@@ -19,7 +21,7 @@
 
 India accounts for roughly a third of the world's oral cancer cases, and most are found late - although the
 disease is usually preceded by visible, treatable changes (leukoplakia, erythroplakia, oral submucous fibrosis)
-that a trained eye can spot in a photograph. **Sankalp** puts that first look in the hands of community health
+that a trained eye can spot in a photograph. **Arogya** puts that first look in the hands of community health
 workers (ASHAs): they photograph the mouth on a phone, record habits and symptoms, and the system decides -
 transparently - who needs to see a specialist, then follows the patient until they do.
 
@@ -41,6 +43,25 @@ The model never decides alone: its probability is one input to an auditable, ver
 approval), alongside tobacco/areca/alcohol history, restricted mouth opening (a sign of submucous fibrosis) and how
 long a patch has been present. Low-quality or unusual photos are caught at capture time and retaken instead of
 being scored.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/home-asha.png" alt="ASHA worker home"><br><sub><b>ASHA home</b> - start a screening, follow-ups due, recent patients</sub></td>
+    <td width="50%"><img src="docs/images/specialist-case.png" alt="Specialist case view"><br><sub><b>Specialist case</b> - photos with AI heat map, per-site scores, reasoning, verdict</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/specialist-queue.png" alt="Specialist review queue"><br><sub><b>Review queue</b> - shared, prioritised by urgency and waiting time</sub></td>
+    <td><img src="docs/images/district.png" alt="District insights"><br><sub><b>District insights</b> - aggregates only, small groups suppressed</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/lead-rules.png" alt="Rules and thresholds"><br><sub><b>Rule governance</b> - every change approved by a second clinical lead</sub></td>
+    <td><img src="docs/images/login.png" alt="Login"><br><sub><b>Sign-in</b> - English, Kannada and Tulu</sub></td>
+  </tr>
+</table>
+
+<sub>Screenshots use the app's built-in demo data; sample photos are generated and watermarked.</sub>
 
 ## The model
 
@@ -64,18 +85,19 @@ being scored.
 
 | Capability | How |
 |---|---|
+| Guided web app | Seven-site photo capture by phone, webcam or upload; live quality checks; on-device mouth-opening measurement (MediaPipe); English, Kannada and Tulu |
 | Reliable field submission | Checksummed photo uploads, idempotent retries, transactional outbox: no screening is lost on a weak network |
 | Photo quality gate | Sharpness, exposure, glare and mouth-tissue checks, identical on the phone and the server |
 | AI inference | ONNX Runtime service: probability, heat map, embedding, out-of-distribution check, shadow model |
 | Clinical decision engine | Versioned rule sets with maker-checker approval, fail-safe rules and decision replay |
 | Retake before review | AI-only or unclear flags trigger a retake of just that site before a specialist is involved |
-| Care continuity | Nearest-facility referral, SMS and voice check-ins, signed QR referral slips, follow-ups, Provider Connect |
+| Care continuity | Nearest-facility referral, appointment booking with patient SMS, voice check-ins, signed QR referral slips, follow-ups, Provider Connect |
 | Specialist workflow | Risk-sorted queue, heat maps, similar confirmed cases, verdicts that become training labels |
 | MLOps | Head retraining on specialist labels, fixed benchmark, shadow mode, approval and rollback |
 | Security and privacy | Keycloak, OPA policies, PostgreSQL row-level security, hash-chained audit log, DPDP-aligned consent |
 | Interoperability | FHIR R4 resources (Patient, Observation, DiagnosticReport, ServiceRequest and more) |
 
-Built with FastAPI, PostgreSQL 16 (PostGIS, pgvector), Celery and Redis, MinIO, Keycloak, Open Policy Agent, Vault,
+Built with React and TypeScript, FastAPI, PostgreSQL 16 (PostGIS, pgvector), Celery and Redis, MinIO, Keycloak, Open Policy Agent, Vault,
 Traefik and Docker Compose. Details: [architecture](docs/architecture.md),
 [clinical decision rules](docs/clinical-decision-rules.md), [API](docs/api.md),
 [security and privacy](docs/security-and-privacy.md), [deployment](docs/deployment.md).
@@ -83,13 +105,14 @@ Traefik and Docker Compose. Details: [architecture](docs/architecture.md),
 ## Repository
 
 ```
+├── web/           web app: React + TypeScript, every role's screens, MediaPipe mouth measurement
 ├── services/      backend: API, inference service, worker, decision engine, migrations, tests
 ├── infra/         PostgreSQL, Keycloak, OPA policies, Vault, Traefik, observability configuration
 ├── ops/           status, end-to-end demo, chaos tests, backups, reset
 ├── training/      model training pipeline (scan → dedupe → split → select → CV → train → evaluate → export)
 ├── notebooks/     the Kaggle notebook used to train model v1.0.0
 ├── models/        model card, integration contract and evaluation reports (weights via Releases)
-├── docs/          architecture, decision rules, API, security, deployment
+├── docs/          architecture, decision rules, API, security, deployment, screenshots
 └── scripts/       fetch-model.sh - download and verify the released model
 ```
 
@@ -104,7 +127,9 @@ docker compose up --build         # first build 10-15 min
 ./ops/demo.sh                     # end-to-end journey with automatic checks
 ```
 
-API documentation: https://localhost/api/docs. Demo accounts, optional profiles and Twilio setup are in
+Open **https://localhost/** and sign in with a demo account (for example `kavya.asha`, an ASHA worker; password
+`OralScreen@2026`). API documentation: https://localhost/api/docs. Adding real staff accounts:
+[docs/deployment.md](docs/deployment.md#adding-staff-accounts). Demo accounts, optional profiles and Twilio setup are in
 [docs/deployment.md](docs/deployment.md).
 
 **Run the reference inference on a photo** (numpy + onnxruntime only)
@@ -120,11 +145,13 @@ python training/oralscreen/inference_reference.py --artifacts models/current --i
 
 - [x] **v0.1.0** - Lesion triage model, training pipeline, model card and release artefacts
 - [x] **v0.2.0** - Backend: inference service, clinical decision engine, referral and specialist workflow, audit
-- [ ] **v1.0.0** - Web app for ASHA workers and specialists: guided capture, quality gate, mouth-opening measurement
+- [x] **v1.0.0** - Web app for ASHA workers and specialists: guided capture, quality gate, mouth-opening measurement
+- [ ] Field validation on photographs taken by ASHA workers, and head retraining on specialist-confirmed cases
+- [ ] Offline-first Android app sharing the same API and model
 
 ## Responsible use
 
-Sankalp is a research prototype. The model was trained on public datasets of uncertain provenance and has **not**
+Arogya is a research prototype. The model was trained on public datasets of uncertain provenance and has **not**
 been validated prospectively or on photographs taken by health workers in the field. It must not be used to rule
 out disease, and every positive screen must be confirmed by a qualified clinician. See the
 [limitations](models/MODEL_CARD.md#limitations).

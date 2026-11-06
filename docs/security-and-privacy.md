@@ -1,6 +1,6 @@
 # Security and privacy
 
-Sankalp processes health information about identifiable people, so access control, auditability and consent are
+Arogya processes health information about identifiable people, so access control, auditability and consent are
 built into every layer rather than added at the edge.
 
 ## Identity and access

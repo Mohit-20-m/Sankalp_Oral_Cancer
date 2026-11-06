@@ -8,6 +8,8 @@ The REST API is served by FastAPI under `/api/v1`. Interactive documentation (Op
 - **Authentication:** `Authorization: Bearer <token>` with a Keycloak access token (client `oralscreen-app`).
 - **Idempotency:** `POST` requests that create data accept an `Idempotency-Key` header; a retried request returns
   the original response. Screenings are additionally de-duplicated by their `client_uuid`.
+- **Phone numbers** are stored in E.164 format; a 10-digit Indian mobile number (with or without a leading 0
+  or 91) is converted to `+91...` automatically.
 - **Request ids:** every response carries a request id that also appears in logs and in the audit trail.
 - **Errors:** standard HTTP status codes with a JSON `detail`; `409` signals a state conflict (for example, a
   retake that was not requested).
