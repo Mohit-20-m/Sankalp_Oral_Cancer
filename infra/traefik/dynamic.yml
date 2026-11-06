@@ -22,7 +22,7 @@ http:
       rule: "PathPrefix(`/auth`)"
       entryPoints: [websecure, web]
       service: keycloak
-      middlewares: [security-headers]
+      middlewares: [auth-headers]
       priority: 40
     storage:                   # presigned photo / heat-map links (signed for this host) → object storage
       rule: "PathPrefix(`/os-images`) || PathPrefix(`/os-derived`) || PathPrefix(`/os-models`)"
@@ -30,6 +30,12 @@ http:
       service: storage
       middlewares: [api-ratelimit]
       priority: 30
+    web:                       # the web app — everything not matched above
+      rule: "PathPrefix(`/`)"
+      entryPoints: [websecure, web]
+      service: web
+      middlewares: [web-headers]
+      priority: 1
     metrics-block:             # API /metrics is for Prometheus inside the network only
       rule: "Path(`/metrics`)"
       entryPoints: [websecure, web]
@@ -53,6 +59,15 @@ http:
         stsSeconds: 31536000
         contentTypeNosniff: true
         frameDeny: true
+        referrerPolicy: no-referrer
+        customResponseHeaders:
+          Server: ""
+
+    auth-headers:              # Keycloak: like security-headers, but its admin console and login-status check
+      headers:                 # embed Keycloak's own pages in frames, so allow same-origin framing only
+        stsSeconds: 31536000
+        contentTypeNosniff: true
+        customFrameOptionsValue: SAMEORIGIN
         referrerPolicy: no-referrer
         customResponseHeaders:
           Server: ""
@@ -86,3 +101,7 @@ http:
         servers:
           - url: "http://minio:9000"
         passHostHeader: true
+    web:
+      loadBalancer:
+        servers:
+          - url: "http://web:8080"

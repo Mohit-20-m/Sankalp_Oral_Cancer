@@ -30,6 +30,9 @@ x-app-env: &app-env
   OS_TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
   OS_TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
   OS_TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+  OS_TWILIO_API_KEY_SID: ${TWILIO_API_KEY_SID:-}
+  OS_TWILIO_API_KEY_SECRET: ${TWILIO_API_KEY_SECRET:-}
+  OS_TWILIO_TRIAL_TEMPLATES: ${TWILIO_TRIAL_TEMPLATES:-false}
   OS_PUBLIC_WEBHOOK_BASE: ${PUBLIC_WEBHOOK_BASE:-}
   OS_MLFLOW_TRACKING_URI: http://mlflow:5000
   OS_HAPI_URL: ${OS_HAPI_URL:-}
@@ -75,6 +78,17 @@ services:
       timeout: 3s
       retries: 5
     mem_limit: 96m
+    networks: [backend]
+    logging: *logging
+
+  web:                                 # web app (React) → https://localhost/
+    build:
+      context: ./web
+      args:
+        VITE_SHOW_DEMO_USERS: ${WEB_SHOW_DEMO_USERS:-true}
+    image: oralscreen/web:1.0.0
+    restart: unless-stopped
+    mem_limit: 64m
     networks: [backend]
     logging: *logging
 
